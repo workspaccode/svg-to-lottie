@@ -1061,8 +1061,7 @@
                 <p class="lead">Arc Studio combines a powerful visual editor, real-time collaboration, and automated
                     workflows — so your product team ships faster without compromise.</p>
                 <div class="hero-actions">
-                    <button class="nav-cta" style="font-size:var(--text-base);padding:14px 32px"
-                        onclick="window.location.href='editor-perview.html'">Start Building
+                    <button class="nav-cta" style="font-size:var(--text-base);padding:14px 32px">Start Building
                         Free</button>
                     <button class="nav-cta"
                         style="background:rgba(255,255,255,0.7);color:var(--fg);border:1px solid var(--border);box-shadow:none;font-size:var(--text-base);padding:14px 32px">Watch

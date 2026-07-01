@@ -172,6 +172,11 @@ body::before {
   padding: 2px 6px; border-radius: 4px; text-transform: uppercase;
   font-weight: 600; letter-spacing: 0.05em; font-family: 'DM Sans', sans-serif;
 }
+.element-anim-badge {
+  font-size: 9px; background: var(--accent); color: #fff;
+  padding: 1px 6px; border-radius: 8px; white-space: nowrap;
+  overflow: hidden; text-overflow: ellipsis; max-width: 70px; flex-shrink: 0;
+}
 .element-auto-badge {
   font-size: 8px; color: var(--accent); background: var(--accent-soft);
   padding: 2px 5px; border-radius: 3px; font-weight: 600;
@@ -278,6 +283,13 @@ body::before {
 .preset-card.selected .preset-icon { color: var(--accent); animation: icon-pop 0.4s cubic-bezier(.34,1.56,.64,1); }
 @keyframes icon-pop { 0% { transform: scale(0.7); } 60% { transform: scale(1.2); } 100% { transform: scale(1); } }
 .preset-name { font-size: 11px; font-weight: 500; color: var(--fg); text-align: center; letter-spacing: -0.01em; }
+.preset-categories { display: flex; gap: 4px; padding: 0 0 8px 0; flex-wrap: wrap; }
+.preset-cat-btn { background: none; border: 1px solid var(--border); color: var(--fg-muted); padding: 3px 10px; border-radius: 12px; font-size: 11px; cursor: pointer; font-family: inherit; transition: all .15s; }
+.preset-cat-btn:hover { background: var(--surface-hover); color: var(--fg); }
+.preset-cat-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+.preset-card-sm { padding: 6px 4px; gap: 2px; border-radius: var(--radius-sm); }
+.preset-card-sm .preset-name { font-size: 10px; }
+.preset-cat-tag { font-size: 8px; color: var(--fg-dim); text-transform: uppercase; letter-spacing: 0.03em; }
 .control { margin-bottom: 14px; }
 .control:last-child { margin-bottom: 0; }
 .control-label { display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--fg-muted); margin-bottom: 8px; font-weight: 500; }
@@ -522,6 +534,10 @@ textarea:focus { border-color: var(--accent); }
       </div>
 
       <div class="actions">
+        <button class="btn btn-primary btn-sm" id="assignBtn" style="font-size:12px;padding:6px 12px;width:100%">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          Assign to Element
+        </button>
         <button class="btn btn-run" id="runBtn">
           <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
           Run Animation
@@ -592,6 +608,8 @@ const state = {
   groups: [],
   selectedGroupId: null,
   selectedPreset: null,
+  elementAnimations: {},
+  currentCategory: 'all',
   duration: 0.6,
   delay: 0,
   stagger: 0,
@@ -646,72 +664,87 @@ const DEFAULT_SVG = `<svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/sv
   <rect id="ground" x="0" y="375" width="400" height="25" fill="#1a1c26"/>
 </svg>`;
 
-// ===== Presets =====
+// ===== Presets (60) =====
+const P = (id, name, cat, kf) => ({ id, name, cat, keyframes: kf });
+function presetCSS(kf) {
+  const parts = [];
+  const maxLen = Math.max(...Object.values(kf).map(v => v.length));
+  for (let i = 0; i < maxLen; i++) {
+    const pct = Math.round(i / (maxLen - 1) * 100);
+    const props = [];
+    if (kf.opacity) props.push(`opacity: ${kf.opacity[i]};`);
+    if (kf.scale) props.push(`transform: scale(${kf.scale[i]});`);
+    else if (kf.scaleX || kf.scaleY) props.push(`transform: scale(${kf.scaleX?.[i] ?? 1}, ${kf.scaleY?.[i] ?? 1});`);
+    else if (kf.x || kf.y) props.push(`transform: translate(${kf.x?.[i] ?? 0}px, ${kf.y?.[i] ?? 0}px);`);
+    if (kf.rotation) props.push(`transform: rotate(${kf.rotation[i]}deg);`);
+    parts.push(`${pct}% { ${props.join(' ')} }`);
+  }
+  return parts.join('\n');
+}
 const PRESETS = {
-  fade: {
-    name: 'Fade in',
-    icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9" opacity="0.25"/><circle cx="12" cy="12" r="9"/></svg>',
-    keyframes: () => `0% { opacity: 0; }
-100% { opacity: 1; }`,
-    needsTransform: false,
-  },
-  slide: {
-    name: 'Slide up',
-    icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></svg>',
-    keyframes: () => `0% { opacity: 0; transform: translateY(40px); }
-100% { opacity: 1; transform: translateY(0); }`,
-    needsTransform: true,
-  },
-  pop: {
-    name: 'Pop in',
-    icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="9" opacity="0.35"/></svg>',
-    keyframes: () => `0% { transform: scale(0); opacity: 0; }
-60% { transform: scale(1.15); opacity: 1; }
-100% { transform: scale(1); }`,
-    needsTransform: true,
-  },
-  shake: {
-    name: 'Shake',
-    icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h2l3-9 4 18 3-9 2 0"/></svg>',
-    keyframes: () => `0%, 100% { transform: translateX(0); }
-10%, 30%, 50%, 70%, 90% { transform: translateX(-8px); }
-20%, 40%, 60%, 80% { transform: translateX(8px); }`,
-    needsTransform: true,
-  },
-  pulse: {
-    name: 'Pulse',
-    icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>',
-    keyframes: () => `0%, 100% { transform: scale(1); }
-50% { transform: scale(1.15); }`,
-    needsTransform: true,
-  },
-  spin: {
-    name: 'Spin',
-    icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9c2.5 0 4.5 1 6 2.5"/><path d="M21 3v6h-6"/></svg>',
-    keyframes: () => `0% { transform: rotate(0deg); }
-100% { transform: rotate(360deg); }`,
-    needsTransform: true,
-  },
-  flip: {
-    name: 'Flip X',
-    icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18"/><path d="M16 7l4 5-4 5"/><path d="M8 7l-4 5 4 5"/></svg>',
-    keyframes: () => `0% { transform: perspective(400px) rotateY(0); }
-100% { transform: perspective(400px) rotateY(360deg); }`,
-    needsTransform: true,
-  },
-  rubber: {
-    name: 'Rubber band',
-    icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="12" rx="10" ry="6"/><ellipse cx="12" cy="12" rx="6" ry="10" opacity="0.4"/></svg>',
-    keyframes: () => `0% { transform: scale(1, 1); }
-30% { transform: scale(1.25, 0.75); }
-40% { transform: scale(0.75, 1.25); }
-50% { transform: scale(1.15, 0.85); }
-65% { transform: scale(0.95, 1.05); }
-75% { transform: scale(1.05, 0.95); }
-100% { transform: scale(1, 1); }`,
-    needsTransform: true,
-  },
+  fade: P('fade', 'Fade In', 'entrance', { opacity: [0, 1] }),
+  fadeUp: P('fadeUp', 'Fade In Up', 'entrance', { opacity: [0, 1], y: [40, 0] }),
+  fadeDown: P('fadeDown', 'Fade In Down', 'entrance', { opacity: [0, 1], y: [-40, 0] }),
+  fadeLeft: P('fadeLeft', 'Fade In Left', 'entrance', { opacity: [0, 1], x: [-60, 0] }),
+  fadeRight: P('fadeRight', 'Fade In Right', 'entrance', { opacity: [0, 1], x: [60, 0] }),
+  fadeScale: P('fadeScale', 'Fade + Scale', 'entrance', { opacity: [0, 1], scale: [0.5, 1] }),
+  slideUp: P('slideUp', 'Slide In Up', 'entrance', { y: [80, 0] }),
+  slideDown: P('slideDown', 'Slide In Down', 'entrance', { y: [-80, 0] }),
+  slideLeft: P('slideLeft', 'Slide In Left', 'entrance', { x: [-120, 0] }),
+  slideRight: P('slideRight', 'Slide In Right', 'entrance', { x: [120, 0] }),
+  zoomIn: P('zoomIn', 'Zoom In', 'entrance', { scale: [0, 1], opacity: [0, 1] }),
+  zoomOut: P('zoomOut', 'Zoom Out (Enter)', 'entrance', { scale: [1.5, 1], opacity: [0, 1] }),
+  flipInX: P('flipInX', 'Flip In X', 'entrance', { scaleX: [0, 1], opacity: [0, 1] }),
+  flipInY: P('flipInY', 'Flip In Y', 'entrance', { scaleY: [0, 1], opacity: [0, 1] }),
+  bounceIn: P('bounceIn', 'Bounce In', 'entrance', { scale: [0, 1.15, 0.9, 1.05, 1], opacity: [0, 1, 1, 1, 1] }),
+  pulse: P('pulse', 'Pulse', 'emphasis', { scale: [1, 1.08, 1] }),
+  bounce: P('bounce', 'Bounce', 'emphasis', { y: [0, -20, 0] }),
+  shake: P('shake', 'Shake', 'emphasis', { x: [0, -10, 10, -10, 10, 0] }),
+  headShake: P('headShake', 'Head Shake', 'emphasis', { x: [0, -6, 6, -6, 6, 0], rotation: [0, -8, 8, -8, 8, 0] }),
+  swing: P('swing', 'Swing', 'emphasis', { rotation: [0, -10, 10, -5, 5, 0] }),
+  tada: P('tada', 'Tada', 'emphasis', { scale: [1, 0.9, 1.1, 1], rotation: [0, -3, 3, -3, 3, 0] }),
+  wobble: P('wobble', 'Wobble', 'emphasis', { x: [0, -25, 20, -15, 10, -5, 0], rotation: [0, -5, 3, -3, 2, -1, 0] }),
+  jello: P('jello', 'Jello', 'emphasis', { scaleX: [1, 1.25, 0.75, 1.15, 0.95, 1.05, 1], scaleY: [1, 0.75, 1.25, 0.85, 1.05, 0.95, 1] }),
+  flash: P('flash', 'Flash', 'emphasis', { opacity: [1, 0, 1, 0, 1] }),
+  heartBeat: P('heartBeat', 'Heart Beat', 'emphasis', { scale: [1, 1.15, 1, 1.15, 1] }),
+  rubber: P('rubber', 'Rubber Band', 'emphasis', { scaleX: [1, 1.25, 0.75, 1.15, 0.95, 1.05, 1], scaleY: [1, 0.75, 1.25, 0.85, 1.05, 0.95, 1] }),
+  glow: P('glow', 'Glow', 'emphasis', { opacity: [1, 0.6, 1] }),
+  wave: P('wave', 'Wave', 'emphasis', { rotation: [0, 8, -8, 6, -6, 3, -3, 0] }),
+  spin: P('spin', 'Spin', 'emphasis', { rotation: [0, 360] }),
+  spinHalf: P('spinHalf', 'Spin Half', 'emphasis', { rotation: [0, 180] }),
+  spinSlow: P('spinSlow', 'Spin Slow', 'emphasis', { rotation: [0, 360] }),
+  pulseQuick: P('pulseQuick', 'Pulse Quick', 'emphasis', { scale: [1, 1.05, 1] }),
+  vibrate: P('vibrate', 'Vibrate', 'emphasis', { x: [0, -2, 2, -2, 2, -2, 2, 0] }),
+  vertBounce: P('vertBounce', 'Vertical Bounce', 'emphasis', { y: [0, -12, 0] }),
+  horizBounce: P('horizBounce', 'Horiz Bounce', 'emphasis', { x: [0, 12, -12, 0] }),
+  rotateScale: P('rotateScale', 'Rotate + Scale', 'emphasis', { rotation: [0, 360], scale: [1, 1.2, 1] }),
+  blink: P('blink', 'Blink', 'emphasis', { opacity: [1, 0, 1, 0, 1, 0, 1] }),
+  flip: P('flip', 'Flip', 'emphasis', { scaleX: [1, -1, 1] }),
+  wobbleV: P('wobbleV', 'Wobble Vertical', 'emphasis', { y: [0, -8, 6, -5, 3, -2, 0], rotation: [0, -3, 2, -2, 1, 0, 0] }),
+  skew: P('skew', 'Skew', 'emphasis', { skewX: [0, -15, 15, -10, 10, 0] }),
+  fadeOut: P('fadeOut', 'Fade Out', 'exit', { opacity: [1, 0] }),
+  fadeOutUp: P('fadeOutUp', 'Fade Out Up', 'exit', { opacity: [1, 0], y: [0, -40] }),
+  fadeOutDown: P('fadeOutDown', 'Fade Out Down', 'exit', { opacity: [1, 0], y: [0, 40] }),
+  fadeOutLeft: P('fadeOutLeft', 'Fade Out Left', 'exit', { opacity: [1, 0], x: [0, -60] }),
+  fadeOutRight: P('fadeOutRight', 'Fade Out Right', 'exit', { opacity: [1, 0], x: [0, 60] }),
+  slideOutUp: P('slideOutUp', 'Slide Out Up', 'exit', { y: [0, -80] }),
+  slideOutDown: P('slideOutDown', 'Slide Out Down', 'exit', { y: [0, 80] }),
+  slideOutLeft: P('slideOutLeft', 'Slide Out Left', 'exit', { x: [0, -120] }),
+  slideOutRight: P('slideOutRight', 'Slide Out Right', 'exit', { x: [0, 120] }),
+  zoomOutExit: P('zoomOutExit', 'Zoom Out', 'exit', { scale: [1, 0], opacity: [1, 0] }),
+  zoomOutBig: P('zoomOutBig', 'Zoom Out Big', 'exit', { scale: [1, 2], opacity: [1, 0] }),
+  flipOutX: P('flipOutX', 'Flip Out X', 'exit', { scaleX: [1, 0], opacity: [1, 0] }),
+  flipOutY: P('flipOutY', 'Flip Out Y', 'exit', { scaleY: [1, 0], opacity: [1, 0] }),
+  bounceOut: P('bounceOut', 'Bounce Out', 'exit', { scale: [1, 1.15, 0.9, 0], opacity: [1, 1, 1, 0] }),
+  collapse: P('collapse', 'Collapse', 'exit', { scaleY: [1, 0], opacity: [1, 0] }),
+  fold: P('fold', 'Fold', 'exit', { scaleX: [1, 0], opacity: [1, 0], x: [0, 60] }),
+  dissolve: P('dissolve', 'Dissolve', 'exit', { opacity: [1, 0.8, 0.5, 0.2, 0] }),
+  dropOut: P('dropOut', 'Drop Out', 'exit', { y: [0, 120], opacity: [1, 0], rotation: [0, 20] }),
+  wipeOut: P('wipeOut', 'Wipe Out', 'exit', { scaleX: [1, 0] }),
+  vanish: P('vanish', 'Vanish', 'exit', { opacity: [1, 0], scale: [1, 0.8] }),
 };
+const PRESET_LIST = Object.values(PRESETS);
+const CATEGORIES = ['all', 'entrance', 'emphasis', 'exit'];
 
 const ELEMENT_COLORS = ['#ff6b4a', '#c4ff3d', '#4ade80', '#a78bfa', '#fbbf24', '#60a5fa', '#f472b6', '#34d399', '#fb923c', '#22d3ee', '#facc15', '#e879f9'];
 
@@ -744,14 +777,35 @@ const animText = $('#animText');
 const createGroupBtn = $('#createGroupBtn');
 const staggerControl = $('#staggerControl');
 
-// ===== Init presets =====
+// ===== Init presets (60 with category tabs) =====
 function initPresets() {
-  Object.entries(PRESETS).forEach(([key, preset]) => {
+  const header = document.createElement('div');
+  header.className = 'preset-categories';
+  CATEGORIES.forEach(cat => {
+    const btn = document.createElement('button');
+    btn.className = 'preset-cat-btn' + (cat === state.currentCategory ? ' active' : '');
+    btn.textContent = cat === 'all' ? 'All' : cat.charAt(0).toUpperCase() + cat.slice(1);
+    btn.addEventListener('click', () => {
+      state.currentCategory = cat;
+      renderPresets();
+      header.querySelectorAll('.preset-cat-btn').forEach(b => b.classList.toggle('active', b.dataset.cat === cat));
+    });
+    btn.dataset.cat = cat;
+    header.appendChild(btn);
+  });
+  presetGrid.parentNode.insertBefore(header, presetGrid);
+  renderPresets();
+}
+
+function renderPresets() {
+  presetGrid.innerHTML = '';
+  const filtered = state.currentCategory === 'all' ? PRESET_LIST : PRESET_LIST.filter(p => p.cat === state.currentCategory);
+  filtered.forEach(preset => {
     const card = document.createElement('div');
-    card.className = 'preset-card';
-    card.dataset.preset = key;
-    card.innerHTML = `<div class="preset-icon">${preset.icon}</div><div class="preset-name">${preset.name}</div>`;
-    card.addEventListener('click', () => selectPreset(key));
+    card.className = 'preset-card preset-card-sm' + (preset.id === state.selectedPreset ? ' selected' : '');
+    card.dataset.preset = preset.id;
+    card.innerHTML = `<div class="preset-name">${preset.name}</div><div class="preset-cat-tag">${preset.cat}</div>`;
+    card.addEventListener('click', () => selectPreset(preset.id));
     presetGrid.appendChild(card);
   });
 }
@@ -786,6 +840,7 @@ function loadSVG(svgText) {
     state.selectedGroupId = null;
     state.groups = [];
     state.selectedPreset = null;
+    state.elementAnimations = {};
     document.querySelectorAll('.preset-card').forEach(c => c.classList.remove('selected'));
     updateSelectionUI();
 
@@ -855,11 +910,13 @@ function renderElementsList() {
     const elItem = document.createElement('div');
     elItem.className = 'element-item';
     elItem.dataset.idx = idx;
+    const assigned = state.elementAnimations[idx];
     elItem.innerHTML = `
       <div class="element-dot" style="background:${item.color};color:${item.color};"></div>
       <div class="element-name">${item.name}</div>
       ${item.autoNamed ? '<span class="element-auto-badge">AUTO</span>' : ''}
-      <div class="element-tag">${item.tag}</div>`;
+      <div class="element-tag">${item.tag}</div>
+      ${assigned ? `<span class="element-anim-badge">${PRESETS[assigned.preset]?.name || assigned.preset}</span>` : ''}`;
     elItem.addEventListener('click', (e) => {
       if (e.ctrlKey || e.metaKey) {
         toggleInSelection(idx);
@@ -1038,8 +1095,26 @@ function selectPreset(key) {
   });
 }
 
+// ===== Assign animation to selected element(s) =====
+  $('#assignBtn').addEventListener('click', () => {
+  if (state.selectedIndices.length === 0) { showToast('Select element(s) first', 'error'); return; }
+  if (!state.selectedPreset) { showToast('Select a preset first', 'error'); return; }
+  const dur = state.duration;
+  const del = state.delay;
+  const rep = state.repeat;
+  const eas = state.easing;
+  state.selectedIndices.forEach(idx => {
+    state.elementAnimations[idx] = { preset: state.selectedPreset, duration: dur, delay: del, repeat: rep, easing: eas };
+  });
+  renderElementsList();
+  const label = state.selectedIndices.length === 1
+    ? state.elements[state.selectedIndices[0]].name
+    : `${state.selectedIndices.length} elements`;
+  showToast(`Assigned "${PRESETS[state.selectedPreset].name}" to ${label}`, 'success');
+});
+
 // ===== Controls =====
- $('#durationSlider').addEventListener('input', (e) => {
+  $('#durationSlider').addEventListener('input', (e) => {
   state.duration = parseFloat(e.target.value);
   $('#durationValue').textContent = state.duration.toFixed(1) + 's';
 });
@@ -1077,35 +1152,49 @@ function getEasingValue(easing) {
   return map[easing] || 'ease';
 }
 
-// ===== Generate CSS (supports multi-select + stagger) =====
+// ===== Generate CSS from numeric keyframe data =====
+function presetToCSS(name, preset) {
+  const kf = preset.keyframes;
+  const maxLen = Math.max(...Object.values(kf).map(v => v.length));
+  const lines = [];
+  for (let i = 0; i < maxLen; i++) {
+    const pct = Math.round(i / (maxLen - 1) * 100);
+    const props = [];
+    if (kf.opacity) props.push(`opacity: ${kf.opacity[i]};`);
+    const transforms = [];
+    if (kf.scale) transforms.push(`scale(${kf.scale[i]})`);
+    else {
+      const sx = kf.scaleX?.[i] ?? 1;
+      const sy = kf.scaleY?.[i] ?? 1;
+      if (sx !== 1 || sy !== 1) transforms.push(`scale(${sx}, ${sy})`);
+    }
+    if (kf.x || kf.y) transforms.push(`translate(${kf.x?.[i] ?? 0}px, ${kf.y?.[i] ?? 0}px)`);
+    if (kf.rotation) transforms.push(`rotate(${kf.rotation[i]}deg)`);
+    if (kf.skewX) transforms.push(`skewX(${kf.skewX[i]}deg)`);
+    if (transforms.length) props.push(`transform: ${transforms.join(' ')}; transform-origin: center; transform-box: fill-box;`);
+    lines.push(`  ${pct}% { ${props.join(' ')} }`);
+  }
+  return `@keyframes ${name} {\n${lines.join('\n')}\n}`;
+}
+
 function generateCSS() {
   if (state.selectedIndices.length === 0 || !state.selectedPreset) return null;
   const preset = PRESETS[state.selectedPreset];
   const animName = `anim-${state.selectedPreset}`;
   const repeat = state.repeat === 'infinite' ? 'infinite' : state.repeat;
   const easingVal = getEasingValue(state.easing);
-  const keyframes = preset.keyframes();
-  const transformBox = preset.needsTransform ? `\n  transform-origin: center;\n  transform-box: fill-box;` : '';
 
-  let css = `@keyframes ${animName} {
- ${keyframes.split('\n').map(l => '  ' + l).join('\n')}
-}\n`;
+  let css = presetToCSS(animName, preset) + '\n';
 
   if (state.selectedIndices.length === 1 || state.stagger === 0) {
-    // Single selector or no stagger — all same timing
     const selectors = state.selectedIndices.map(idx =>
       `#svgCanvas ${state.elements[idx].selector}`
     ).join(',\n');
-    css += `\n${selectors} {
-  animation: ${animName} ${state.duration}s ${easingVal} ${state.delay}s ${repeat} both;${transformBox}
-}`;
+    css += `\n${selectors} {\n  animation: ${animName} ${state.duration}s ${easingVal} ${state.delay}s ${repeat} both;\n}`;
   } else {
-    // Multiple selectors with stagger
     state.selectedIndices.forEach((idx, i) => {
       const staggerDelay = state.delay + (state.stagger * i / 1000);
-      css += `\n#svgCanvas ${state.elements[idx].selector} {
-  animation: ${animName} ${state.duration}s ${easingVal} ${staggerDelay.toFixed(2)}s ${repeat} both;${transformBox}
-}`;
+      css += `\n#svgCanvas ${state.elements[idx].selector} {\n  animation: ${animName} ${state.duration}s ${easingVal} ${staggerDelay.toFixed(2)}s ${repeat} both;\n}`;
     });
   }
 
@@ -1213,223 +1302,330 @@ function highlightCSS(css) {
  $('#closeCssModal').addEventListener('click', () => $('#cssModal').classList.remove('active'));
  $('#closeCssModalBtn').addEventListener('click', () => $('#cssModal').classList.remove('active'));
 
-// ===== Export Lottie (supports multiple elements) =====
+// ===== Export Lottie (uses per-element assigned animations, with fallback to current selection) =====
  $('#exportLottieBtn').addEventListener('click', () => {
-  if (state.selectedIndices.length === 0) {
-    showToast('Select at least one element first', 'error');
-    return;
-  }
-  if (!state.selectedPreset) {
-    showToast('Select an animation preset first', 'error');
-    return;
-  }
-
   const lottie = generateLottie();
+  if (!lottie) return;
   const json = JSON.stringify(lottie, null, 2);
   const blob = new Blob([json], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  const elemDesc = state.selectedIndices.length === 1
-    ? state.elements[state.selectedIndices[0]].name
-    : `${state.selectedIndices.length}-elements`;
-  a.download = `lottie-${state.selectedPreset}-${elemDesc}-${Date.now()}.json`;
+  a.download = `lottie-animation-${Date.now()}.json`;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
-  showToast(`Lottie JSON exported (${state.selectedIndices.length} layer${state.selectedIndices.length > 1 ? 's' : ''})`, 'success');
+  showToast('Lottie JSON exported', 'success');
 });
 
-function generateLottie() {
-  const preset = state.selectedPreset;
-  const duration = state.duration;
-  const delay = state.delay;
-  const framerate = 60;
-  const animFrames = Math.max(1, Math.round(duration * framerate));
-  const delayFrames = Math.round(delay * framerate);
-  const staggerFrames = Math.round(state.stagger * framerate / 1000);
-  const repeatCount = state.repeat === 'infinite' ? 3 : state.repeat;
-  const maxStagger = staggerFrames * (state.selectedIndices.length - 1);
-  const totalFrames = delayFrames + maxStagger + animFrames * repeatCount;
+function parseLottieColor(hex) {
+  if (!hex || hex === 'none') return [0, 0, 0, 0];
+  const v = hex.replace('#', '');
+  return [parseInt(v.substring(0, 2), 16) / 255, parseInt(v.substring(2, 4), 16) / 255, parseInt(v.substring(4, 6), 16) / 255, 1];
+}
 
-  const easeBezier = {
-    'ease': { i: { x: [0.66], y: [1] }, o: { x: [0.34], y: [0] } },
-    'ease-in-out': { i: { x: [0.5], y: [1] }, o: { x: [0.5], y: [0] } },
-    'bounce': { i: { x: [0.68], y: [-0.55] }, o: { x: [0.27], y: [1.55] } },
-    'linear': { i: { x: [1], y: [1] }, o: { x: [0], y: [0] } }
+function getElementBounds(el) {
+  try {
+    const bbox = el.getBBox ? el.getBBox() : { x: 0, y: 0, width: 100, height: 100 };
+    return { x: bbox.x, y: bbox.y, w: bbox.width, h: bbox.height, cx: bbox.x + bbox.width / 2, cy: bbox.y + bbox.height / 2 };
+  } catch { return { x: 0, y: 0, w: 100, h: 100, cx: 50, cy: 50 }; }
+}
+
+function svgPathToLottie(d) {
+  const shapes = [];
+  let cur = { i: [], o: [], v: [], c: false };
+  let cx = 0, cy = 0, sx = 0, sy = 0;
+  function close() { if (cur.v.length) { cur.c = true; shapes.push(cur); } cur = { i: [], o: [], v: [], c: false }; }
+  function emit() { if (cur.v.length) { shapes.push(cur); cur = { i: [], o: [], v: [], c: false }; } }
+  function addV(x, y, ix, iy, ox, oy) { cur.v.push([x, y]); cur.i.push([ix, iy]); cur.o.push([ox, oy]); }
+  function pN(s, i) { const m = s.substring(i).match(/-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?/); return m ? [parseFloat(m[0]), i + m[0].length] : [0, i]; }
+  function pC(s, i, n) { const vals = []; while (vals.length < n && i < s.length) { const [v, ni] = pN(s, i); vals.push(v); i = ni; while (i < s.length && /[\s,]/.test(s[i])) i++; } return [vals, i]; }
+
+  let i = 0;
+  while (i < d.length) {
+    while (i < d.length && /[\s,]/.test(d[i])) i++;
+    if (i >= d.length) break;
+    const cmd = d[i]; i++;
+    while (i < d.length && /[\s,]/.test(d[i])) i++;
+    switch (cmd) {
+      case 'M': { emit(); const [v,ni]=pC(d,i,2); cx=v[0]; cy=v[1]; sx=cx; sy=cy; addV(cx,cy,0,0,0,0); i=ni; break; }
+      case 'm': { emit(); const [v,ni]=pC(d,i,2); cx+=v[0]; cy+=v[1]; sx=cx; sy=cy; addV(cx,cy,0,0,0,0); i=ni; break; }
+      case 'L': { const [v,ni]=pC(d,i,2); cx=v[0]; cy=v[1]; addV(cx,cy,0,0,0,0); i=ni; break; }
+      case 'l': { const [v,ni]=pC(d,i,2); cx+=v[0]; cy+=v[1]; addV(cx,cy,0,0,0,0); i=ni; break; }
+      case 'H': { const [v,ni]=pC(d,i,1); cx=v[0]; addV(cx,cy,0,0,0,0); i=ni; break; }
+      case 'h': { const [v,ni]=pC(d,i,1); cx+=v[0]; addV(cx,cy,0,0,0,0); i=ni; break; }
+      case 'V': { const [v,ni]=pC(d,i,1); cy=v[0]; addV(cx,cy,0,0,0,0); i=ni; break; }
+      case 'v': { const [v,ni]=pC(d,i,1); cy+=v[0]; addV(cx,cy,0,0,0,0); i=ni; break; }
+      case 'C': {
+        const [cv,ci]=pC(d,i,6); const x1=cv[0],y1=cv[1],x2=cv[2],y2=cv[3],x3=cv[4],y3=cv[5];
+        const pv = cur.v.length ? cur.v[cur.v.length-1] : [cx,cy];
+        if (cur.o.length) { cur.o[cur.o.length-1] = [x1-pv[0], y1-pv[1]]; }
+        cx=x3; cy=y3; addV(cx,cy,pv[0]-x2,pv[1]-y2,0,0); i=ci; break;
+      }
+      case 'c': {
+        const [cv,ci]=pC(d,i,6); const x1=cx+cv[0],y1=cy+cv[1],x2=cx+cv[2],y2=cy+cv[3],x3=cx+cv[4],y3=cy+cv[5];
+        const pv = cur.v.length ? cur.v[cur.v.length-1] : [cx,cy];
+        if (cur.o.length) { cur.o[cur.o.length-1] = [x1-pv[0], y1-pv[1]]; }
+        cx=x3; cy=y3; addV(cx,cy,pv[0]-x2,pv[1]-y2,0,0); i=ci; break;
+      }
+      case 'S': {
+        const [sv,si]=pC(d,i,4); const x2=sv[0],y2=sv[1],x3=sv[2],y3=sv[3];
+        const pv = cur.v.length ? cur.v[cur.v.length-1] : [cx,cy];
+        const po = cur.o.length ? cur.o[cur.o.length-1] : [0,0];
+        const x1 = pv[0] + (pv[0]-(pv[0]-po[0])), y1 = pv[1] + (pv[1]-(pv[1]-po[1]));
+        if (cur.o.length) { cur.o[cur.o.length-1] = [x1-pv[0], y1-pv[1]]; }
+        cx=x3; cy=y3; addV(cx,cy,pv[0]-x2,pv[1]-y2,0,0); i=si; break;
+      }
+      case 's': {
+        const [sv,si]=pC(d,i,4); const pv=cur.v.length?cur.v[cur.v.length-1]:[cx,cy];
+        const po=cur.o.length?cur.o[cur.o.length-1]:[0,0];
+        const x1=pv[0]+(pv[0]-(pv[0]-po[0])),y1=pv[1]+(pv[1]-(pv[1]-po[1]));
+        const x2=pv[0]+sv[0],y2=pv[1]+sv[1],x3=pv[0]+sv[2],y3=pv[1]+sv[3];
+        if(cur.o.length){cur.o[cur.o.length-1]=[x1-pv[0],y1-pv[1]];}
+        cx=x3;cy=y3;addV(cx,cy,pv[0]-x2,pv[1]-y2,0,0);i=si;break;
+      }
+      case 'Q': {
+        const [qv,qi]=pC(d,i,4);const p0=cur.v.length?cur.v[cur.v.length-1]:[cx,cy];
+        const cx1=p0[0]+(qv[0]-p0[0])*2/3,cy1=p0[1]+(qv[1]-p0[1])*2/3;
+        const cx2=qv[2]+(qv[0]-qv[2])*2/3,cy2=qv[3]+(qv[1]-qv[3])*2/3;
+        if(cur.o.length){cur.o[cur.o.length-1]=[cx1-p0[0],cy1-p0[1]];}
+        cx=qv[2];cy=qv[3];addV(cx,cy,p0[0]-cx2,p0[1]-cy2,0,0);i=qi;break;
+      }
+      case 'q': {
+        const [qv,qi]=pC(d,i,4);const p0=cur.v.length?cur.v[cur.v.length-1]:[cx,cy];
+        const qx1=p0[0]+qv[0],qy1=p0[1]+qv[1],qx2=p0[0]+qv[2],qy2=p0[1]+qv[3];
+        const cx1=p0[0]+(qx1-p0[0])*2/3,cy1=p0[1]+(qy1-p0[1])*2/3;
+        const cx2=qx2+(qx1-qx2)*2/3,cy2=qy2+(qy1-qy2)*2/3;
+        if(cur.o.length){cur.o[cur.o.length-1]=[cx1-p0[0],cy1-p0[1]];}
+        cx=qx2;cy=qy2;addV(cx,cy,p0[0]-cx2,p0[1]-cy2,0,0);i=qi;break;
+      }
+      case 'T': {
+        const [tv,ti]=pC(d,i,2);const p0=cur.v.length?cur.v[cur.v.length-1]:[cx,cy];
+        const po=cur.o.length>=2?cur.o[cur.o.length-2]:[0,0];
+        const rfX=p0[0]+(p0[0]-(p0[0]-po[0])),rfY=p0[1]+(p0[1]-(p0[1]-po[1]));
+        const qx1=p0[0]+(rfX-p0[0]),qy1=p0[1]+(rfY-p0[1]);
+        const cx1=p0[0]+(qx1-p0[0])*2/3,cy1=p0[1]+(qy1-p0[1])*2/3;
+        const cx2=tv[0]+(qx1-tv[0])*2/3,cy2=tv[1]+(qy1-tv[1])*2/3;
+        if(cur.o.length){cur.o[cur.o.length-1]=[cx1-p0[0],cy1-p0[1]];}
+        cx=tv[0];cy=tv[1];addV(cx,cy,p0[0]-cx2,p0[1]-cy2,0,0);i=ti;break;
+      }
+      case 't': {
+        const [tv,ti]=pC(d,i,2);const p0=cur.v.length?cur.v[cur.v.length-1]:[cx,cy];
+        const po=cur.o.length>=2?cur.o[cur.o.length-2]:[0,0];
+        const rfX=p0[0]+(p0[0]-(p0[0]-po[0])),rfY=p0[1]+(p0[1]-(p0[1]-po[1]));
+        const qx1=p0[0]+(rfX-p0[0]),qy1=p0[1]+(rfY-p0[1]);
+        const cx1=p0[0]+(qx1-p0[0])*2/3,cy1=p0[1]+(qy1-p0[1])*2/3;
+        const qx2=p0[0]+tv[0],qy2=p0[1]+tv[1];
+        const cx2=qx2+(qx1-qx2)*2/3,cy2=qy2+(qy1-qy2)*2/3;
+        if(cur.o.length){cur.o[cur.o.length-1]=[cx1-p0[0],cy1-p0[1]];}
+        cx=qx2;cy=qy2;addV(cx,cy,p0[0]-cx2,p0[1]-cy2,0,0);i=ti;break;
+      }
+      case 'A': case 'a': {
+        const [av,ai]=pC(d,i,7);const rx=av[0],ry=av[1];
+        let ex=av[5],ey=av[6];
+        if(cmd==='a'){ex+=cx;ey+=cy;}
+        for(let k=1;k<=16;k++){const t=k/16;addV(ex+rx*Math.cos(t*Math.PI*2),ey+ry*Math.sin(t*Math.PI*2),0,0,0,0);}
+        cx=ex;cy=ey;i=ai;break;
+      }
+      case 'Z':case 'z':{close();cx=sx;cy=sy;break;}
+      default: i++; break;
+    }
+  }
+  emit();
+  return shapes;
+}
+
+function buildLottieShape(el) {
+  const tag = el.tagName.toLowerCase();
+  const bounds = getElementBounds(el);
+  const fill = parseLottieColor(el.getAttribute('fill'));
+  const stroke = parseLottieColor(el.getAttribute('stroke'));
+  const sw = parseFloat(el.getAttribute('stroke-width')) || 0;
+  let shapeData;
+
+  switch (tag) {
+    case 'rect': {
+      const x = parseFloat(el.getAttribute('x')) || 0;
+      const y = parseFloat(el.getAttribute('y')) || 0;
+      const w = parseFloat(el.getAttribute('width')) || 100;
+      const h = parseFloat(el.getAttribute('height')) || 100;
+      const rx = parseFloat(el.getAttribute('rx')) || 0;
+      const rr = Math.min(rx, w/2, h/2);
+      const d = rr > 0
+        ? `M${x+rr},${y} L${x+w-rr},${y} Q${x+w},${y} ${x+w},${y+rr} L${x+w},${y+h-rr} Q${x+w},${y+h} ${x+w-rr},${y+h} L${x+rr},${y+h} Q${x},${y+h} ${x},${y+h-rr} L${x},${y+rr} Q${x},${y} ${x+rr},${y} Z`
+        : `M${x},${y} L${x+w},${y} L${x+w},${y+h} L${x},${y+h} Z`;
+      shapeData = { shapes: svgPathToLottie(d), fill, stroke, sw, bounds };
+      break;
+    }
+    case 'circle': {
+      const cx = parseFloat(el.getAttribute('cx')) || 50;
+      const cy = parseFloat(el.getAttribute('cy')) || 50;
+      const r = parseFloat(el.getAttribute('r')) || 40;
+      shapeData = { shapes: svgPathToLottie(`M${cx-r},${cy} A${r},${r} 0 1,1 ${cx+r},${cy} A${r},${r} 0 1,1 ${cx-r},${cy} Z`), fill, stroke, sw, bounds };
+      break;
+    }
+    case 'ellipse': {
+      const cx = parseFloat(el.getAttribute('cx')) || 50;
+      const cy = parseFloat(el.getAttribute('cy')) || 50;
+      const rx = parseFloat(el.getAttribute('rx')) || 40;
+      const ry = parseFloat(el.getAttribute('ry')) || 30;
+      shapeData = { shapes: svgPathToLottie(`M${cx-rx},${cy} A${rx},${ry} 0 1,1 ${cx+rx},${cy} A${rx},${ry} 0 1,1 ${cx-rx},${cy} Z`), fill, stroke, sw, bounds };
+      break;
+    }
+    case 'path': {
+      shapeData = { shapes: svgPathToLottie(el.getAttribute('d') || ''), fill, stroke, sw, bounds };
+      break;
+    }
+    case 'line': {
+      const x1 = parseFloat(el.getAttribute('x1')) || 0;
+      const y1 = parseFloat(el.getAttribute('y1')) || 0;
+      const x2 = parseFloat(el.getAttribute('x2')) || 100;
+      const y2 = parseFloat(el.getAttribute('y2')) || 100;
+      shapeData = { shapes: svgPathToLottie(`M${x1},${y1} L${x2},${y2}`), fill, stroke, sw, bounds };
+      break;
+    }
+    case 'polygon': case 'polyline': {
+      const pts = (el.getAttribute('points') || '').trim().split(/[\s,]+/).map(Number);
+      let d = '';
+      for (let j = 0; j < pts.length; j += 2) d += (j === 0 ? 'M' : 'L') + pts[j] + ',' + pts[j+1];
+      if (tag === 'polygon') d += ' Z';
+      shapeData = { shapes: svgPathToLottie(d), fill, stroke, sw, bounds };
+      break;
+    }
+    default: {
+      const b = bounds;
+      shapeData = { shapes: svgPathToLottie(`M${b.x},${b.y} L${b.x+b.w},${b.y} L${b.x+b.w},${b.y+b.h} L${b.x},${b.y+b.h} Z`), fill, stroke, sw, bounds };
+    }
+  }
+  return shapeData;
+}
+
+function buildLottieTransform(anim, bounds) {
+  const preset = PRESETS[anim.preset];
+  if (!preset) return null;
+  const dur = anim.duration;
+  const delay = anim.delay;
+  const cx = bounds.cx, cy = bounds.cy;
+  const easeMap = { 'ease': [0.66, 0, 0.34, 1], 'ease-in-out': [0.5, 0, 0.5, 1], 'bounce': [0.68, -0.55, 0.27, 1.55], 'linear': [0, 0, 1, 1] };
+  const e = easeMap[anim.easing] || easeMap.ease;
+
+  function mkKF(vals, mult) {
+    const total = delay + dur;
+    return vals.map((v, idx) => {
+      const t = delay + (idx / (vals.length - 1 || 1)) * dur;
+      return { t: t / total, s: [typeof v === 'number' ? v * (mult || 1) : v], e: e, i: { x: [e[0]], y: [e[1]] }, o: { x: [e[2]], y: [e[3]] } };
+    });
+  }
+
+  const kf = preset.keyframes;
+  const hasX = kf.x?.some(v => v !== 0);
+  const hasY = kf.y?.some(v => v !== 0);
+  const hasScale = kf.scale?.some(v => v !== 1);
+  const hasScaleX = kf.scaleX?.some(v => v !== 1);
+  const hasScaleY = kf.scaleY?.some(v => v !== 1);
+  const hasRot = kf.rotation?.some(v => v !== 0);
+  const hasOpacity = kf.opacity?.some(v => v !== 1);
+  const hasSkew = kf.skewX?.some(v => v !== 0);
+
+  return {
+    anchor: [cx, cy, 0],
+    position: {
+      a: 0,
+      k: hasX || hasY ? [
+        { t: 0, s: [(kf.x?.[0] ?? 0) + cx, (kf.y?.[0] ?? 0) + cy, 0], e, i: { x: [e[0]], y: [e[1]] }, o: { x: [e[2]], y: [e[3]] } },
+        { t: 1, s: [(kf.x?.[kf.x.length-1] ?? 0) + cx, (kf.y?.[kf.y.length-1] ?? 0) + cy, 0], e, i: { x: [e[0]], y: [e[1]] }, o: { x: [e[2]], y: [e[3]] } }
+      ] : [cx, cy, 0]
+    },
+    scale: {
+      a: 0,
+      k: hasScale ? mkKF(kf.scale, 100) :
+        hasScaleX || hasScaleY ? [
+          { t: 0, s: [(kf.scaleX?.[0] ?? 1) * 100, (kf.scaleY?.[0] ?? 1) * 100, 100], e, i: { x: [e[0]], y: [e[1]] }, o: { x: [e[2]], y: [e[3]] } },
+          { t: 1, s: [(kf.scaleX?.[kf.scaleX.length-1] ?? 1) * 100, (kf.scaleY?.[kf.scaleY.length-1] ?? 1) * 100, 100], e, i: { x: [e[0]], y: [e[1]] }, o: { x: [e[2]], y: [e[3]] } }
+        ] : [100, 100, 100]
+    },
+    rotation: { a: 0, k: hasRot ? mkKF(kf.rotation) : [0] },
+    opacity: { a: 0, k: hasOpacity ? mkKF(kf.opacity) : [100] },
+    skew: hasSkew ? { a: 0, k: mkKF(kf.skewX) } : undefined,
+    skewAxis: hasSkew ? { a: 0, k: [0] } : undefined,
   };
-  const ez = easeBezier[state.easing] || easeBezier['ease'];
+}
 
-  const layers = state.selectedIndices.map((idx, layerIdx) => {
+function generateLottie() {
+  // Use assigned animations, or fall back to current selection
+  const assigned = Object.keys(state.elementAnimations).filter(k => {
+    const idx = parseInt(k);
+    return idx >= 0 && idx < state.elements.length;
+  }).map(Number);
+
+  const useIndices = assigned.length > 0 ? assigned : state.selectedIndices;
+
+  if (useIndices.length === 0) {
+    showToast('Assign animations to elements first, or select elements', 'error');
+    return null;
+  }
+
+  const framerate = 60;
+  const vb = state.svgElement?.getAttribute('viewBox') || '0 0 400 400';
+  const vbParts = vb.split(/\s+/).map(Number);
+  const w = vbParts[2] || 400;
+  const h = vbParts[3] || 400;
+
+  const layers = [];
+  let maxOp = 0;
+
+  useIndices.forEach((idx, layerIdx) => {
     const el = state.elements[idx];
-    const startFrame = delayFrames + staggerFrames * layerIdx;
-    const endFrame = startFrame + animFrames;
-    const ks = buildTransform(preset, startFrame, endFrame, animFrames, ez);
-    const shape = buildShapeForElement(el);
-    return {
-      ddd: 0,
-      ind: layerIdx + 1,
-      ty: 4,
-      nm: el.name,
-      sr: 1,
-      ks: ks,
-      ao: 0,
-      ip: 0,
-      op: totalFrames,
-      st: 0,
-      bm: 0,
-      shapes: shape
+    const anim = state.elementAnimations[idx] || { preset: state.selectedPreset || 'fade', duration: state.duration, delay: state.delay, repeat: state.repeat, easing: state.easing };
+    const preset = PRESETS[anim.preset];
+    if (!preset) return;
+
+    const shapeData = buildLottieShape(el.el);
+    const lottieShapes = [];
+
+    shapeData.shapes.forEach(s => {
+      const vertData = s.v.map((p, vi) => ({
+        i: { x: [s.i[vi]?.[0] || 0], y: [s.i[vi]?.[1] || 0] },
+        o: { x: [s.o[vi]?.[0] || 0], y: [s.o[vi]?.[1] || 0] },
+        c: s.c,
+        v: [p[0], p[1]]
+      }));
+      lottieShapes.push({ ty: 'sh', d: 1, ks: { a: 0, k: { a: 0, k: [{ t: 0, s: vertData }] } } });
+    });
+
+    lottieShapes.push({ ty: 'fl', o: { a: 0, k: 100 }, c: { a: 0, k: shapeData.fill }, r: 1, bm: 0 });
+    if (shapeData.sw > 0) {
+      lottieShapes.push({ ty: 'st', o: { a: 0, k: 100 }, c: { a: 0, k: shapeData.stroke }, w: { a: 0, k: shapeData.sw }, lc: 1, lj: 1, bm: 0 });
+    }
+
+    const transform = buildLottieTransform(anim, shapeData.bounds);
+    const repeat = typeof anim.repeat === 'number' ? anim.repeat : 1;
+    const layerDuration = (anim.delay + anim.duration) * repeat;
+    const layerFrames = Math.max(Math.round(layerDuration * 60), 1);
+    if (layerFrames > maxOp) maxOp = layerFrames;
+
+    const layer = {
+      dd: 0, ty: 4, nm: el.name, sr: 1, st: 0, op: layerFrames, ip: 0,
+      ks: {
+        a: { a: 0, k: transform.anchor },
+        p: transform.position,
+        s: transform.scale,
+        r: transform.rotation,
+        o: transform.opacity,
+      },
+      shapes: lottieShapes,
+      ind: layerIdx + 1
     };
+    if (transform.skew) layer.ks.sk = transform.skew;
+    if (transform.skewAxis) layer.ks.sa = transform.skewAxis;
+    layers.push(layer);
   });
 
   return {
-    v: '5.7.4',
-    fr: framerate,
-    ip: 0,
-    op: totalFrames,
-    w: 400,
-    h: 400,
-    nm: `lottie-${preset}`,
-    ddd: 0,
-    assets: [],
-    layers: layers,
-    meta: {
-      generator: 'SVG Animation Studio',
-      preset: preset,
-      elementNames: state.selectedIndices.map(i => state.elements[i].name),
-      duration: duration,
-      delay: delay,
-      stagger: state.stagger,
-      repeat: state.repeat,
-      easing: state.easing,
-      generatedAt: new Date().toISOString()
-    }
+    v: '5.5.2', fr: framerate, ip: 0, op: Math.max(maxOp, 60),
+    w, h, nm: 'Animation', ddd: 0, assets: [], layers, markers: []
   };
-}
-
-function buildTransform(preset, startFrame, endFrame, animFrames, ez) {
-  const ks = {
-    o: { a: 0, k: 100 },
-    r: { a: 0, k: 0 },
-    p: { a: 0, k: [200, 200] },
-    a: { a: 0, k: [0, 0] },
-    s: { a: 0, k: [100, 100] }
-  };
-
-  if (preset === 'fade') {
-    ks.o = { a: 1, k: [
-      { t: startFrame, s: [0], i: ez.i, o: ez.o },
-      { t: endFrame, s: [100] }
-    ]};
-  } else if (preset === 'slide') {
-    ks.o = { a: 1, k: [
-      { t: startFrame, s: [0], i: ez.i, o: ez.o },
-      { t: endFrame, s: [100] }
-    ]};
-    ks.p = { a: 1, k: [
-      { t: startFrame, s: [200, 240], i: ez.i, o: ez.o, to: [0, -6.67], ti: [0, 0] },
-      { t: endFrame, s: [200, 200], to: [0, 0], ti: [0, -6.67] }
-    ]};
-  } else if (preset === 'pop') {
-    ks.s = { a: 1, k: [
-      { t: startFrame, s: [0, 0], i: { x: [0.34], y: [1.56] }, o: { x: [0.64], y: [1] } },
-      { t: Math.round(startFrame + animFrames * 0.6), s: [115, 115], i: ez.i, o: ez.o },
-      { t: endFrame, s: [100, 100] }
-    ]};
-    ks.o = { a: 1, k: [
-      { t: startFrame, s: [0], i: ez.i, o: ez.o },
-      { t: Math.round(startFrame + animFrames * 0.6), s: [100] }
-    ]};
-  } else if (preset === 'shake') {
-    const offsets = [-8, 8, -8, 8, -8, 8, -8, 8, 0];
-    const kfs = offsets.map((off, i) => ({
-      t: Math.round(startFrame + (animFrames * i / (offsets.length - 1))),
-      s: [200 + off, 200],
-      i: ez.i, o: ez.o, to: [0, 0], ti: [0, 0]
-    }));
-    ks.p = { a: 1, k: kfs };
-  } else if (preset === 'pulse') {
-    ks.s = { a: 1, k: [
-      { t: startFrame, s: [100, 100], i: ez.i, o: ez.o },
-      { t: Math.round(startFrame + animFrames * 0.5), s: [115, 115], i: ez.i, o: ez.o },
-      { t: endFrame, s: [100, 100] }
-    ]};
-  } else if (preset === 'spin') {
-    ks.r = { a: 1, k: [
-      { t: startFrame, s: [0], i: ez.i, o: ez.o },
-      { t: endFrame, s: [360] }
-    ]};
-  } else if (preset === 'flip') {
-    ks.r = { a: 1, k: [
-      { t: startFrame, s: [0], i: ez.i, o: ez.o },
-      { t: endFrame, s: [360] }
-    ]};
-  } else if (preset === 'rubber') {
-    ks.s = { a: 1, k: [
-      { t: startFrame, s: [100, 100], i: ez.i, o: ez.o },
-      { t: Math.round(startFrame + animFrames * 0.3), s: [125, 75], i: ez.i, o: ez.o },
-      { t: Math.round(startFrame + animFrames * 0.4), s: [75, 125], i: ez.i, o: ez.o },
-      { t: Math.round(startFrame + animFrames * 0.5), s: [115, 85], i: ez.i, o: ez.o },
-      { t: Math.round(startFrame + animFrames * 0.65), s: [95, 105], i: ez.i, o: ez.o },
-      { t: Math.round(startFrame + animFrames * 0.75), s: [105, 95], i: ez.i, o: ez.o },
-      { t: endFrame, s: [100, 100] }
-    ]};
-  }
-
-  return ks;
-}
-
-function buildShapeForElement(item) {
-  const el = item.el;
-  const tag = item.tag;
-  const fill = el.getAttribute('fill') || '#ff6b4a';
-  const rgb = hexToRgb(fill);
-  const fillColor = rgb ? [rgb.r / 255, rgb.g / 255, rgb.b / 255, 1] : [1, 0.42, 0.29, 1];
-
-  let shape = null;
-  if (tag === 'rect') {
-    const x = parseFloat(el.getAttribute('x')) || 0;
-    const y = parseFloat(el.getAttribute('y')) || 0;
-    const w = parseFloat(el.getAttribute('width')) || 100;
-    const h = parseFloat(el.getAttribute('height')) || 100;
-    shape = { ty: 'rc', d: 1, s: { a: 0, k: [w, h] }, p: { a: 0, k: [x + w/2, y + h/2] }, r: { a: 0, k: 0 } };
-  } else if (tag === 'circle') {
-    const cx = parseFloat(el.getAttribute('cx')) || 0;
-    const cy = parseFloat(el.getAttribute('cy')) || 0;
-    const r = parseFloat(el.getAttribute('r')) || 50;
-    shape = { ty: 'el', d: 1, s: { a: 0, k: [r * 2, r * 2] }, p: { a: 0, k: [cx, cy] } };
-  } else if (tag === 'ellipse') {
-    const cx = parseFloat(el.getAttribute('cx')) || 0;
-    const cy = parseFloat(el.getAttribute('cy')) || 0;
-    const rx = parseFloat(el.getAttribute('rx')) || 50;
-    const ry = parseFloat(el.getAttribute('ry')) || 30;
-    shape = { ty: 'el', d: 1, s: { a: 0, k: [rx * 2, ry * 2] }, p: { a: 0, k: [cx, cy] } };
-  } else {
-    shape = { ty: 'rc', d: 1, s: { a: 0, k: [120, 120] }, p: { a: 0, k: [200, 200] }, r: { a: 0, k: 0 } };
-  }
-
-  return [{
-    ty: 'gr',
-    it: [
-      shape,
-      { ty: 'fl', c: { a: 0, k: fillColor }, o: { a: 0, k: 100 }, r: 1 },
-      { ty: 'tr', p: { a: 0, k: [0, 0] }, a: { a: 0, k: [0, 0] }, s: { a: 0, k: [100, 100] }, r: { a: 0, k: 0 }, o: { a: 0, k: 100 } }
-    ]
-  }];
-}
-
-function hexToRgb(hex) {
-  if (!hex || typeof hex !== 'string') return null;
-  hex = hex.trim();
-  if (hex.startsWith('#')) {
-    let h = hex.slice(1);
-    if (h.length === 3) h = h.split('').map(c => c + c).join('');
-    if (h.length !== 6) return null;
-    const num = parseInt(h, 16);
-    return { r: (num >> 16) & 255, g: (num >> 8) & 255, b: num & 255 };
-  }
-  return null;
 }
 
 // ===== Upload / Paste =====
