@@ -255,14 +255,61 @@ body::before {
 .svg-canvas svg .hover-element {
   filter: drop-shadow(0 0 5px var(--accent)) !important;
 }
-.right-panel {
-  width: 340px; background: var(--bg-elevated);
-  border-left: 1px solid var(--border);
-  display: flex; flex-direction: column; overflow: hidden; flex-shrink: 0;
+/* ===== Right Panel Drawer ===== */
+.drawer-toggle {
+  position: absolute; right: 0; top: 50%; z-index: 5;
+  width: 26px; height: 52px; transform: translateY(-50%);
+  background: var(--bg-elevated); border: 1px solid var(--border);
+  border-right: none; border-radius: 8px 0 0 8px;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  color: var(--fg-muted); transition: all 0.25s;
+  font-size: 14px; padding: 0;
 }
-.panel-section { border-bottom: 1px solid var(--border); padding: 16px; }
-.panel-section:last-of-type { border-bottom: none; }
-.panel-section.scrollable { flex: 1; overflow-y: auto; min-height: 0; }
+.drawer-toggle:hover { color: var(--fg); background: var(--surface-hover); width: 30px; }
+.drawer-toggle.open { right: 400px; }
+.drawer-toggle svg { width: 15px; height: 15px; transition: transform 0.3s; }
+.drawer-toggle.open svg { transform: rotate(180deg); }
+.right-panel {
+  position: absolute; top: 0; right: 0; bottom: 0;
+  width: 400px; background: var(--bg-elevated);
+  border-left: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  z-index: 10;
+  transform: translateX(100%);
+  transition: transform 0.3s cubic-bezier(.4,0,.2,1);
+}
+.right-panel.open { transform: translateX(0); }
+.drawer-header {
+  display: flex; align-items: stretch; flex-shrink: 0;
+  border-bottom: 1px solid var(--border);
+}
+.drawer-tabs { display: flex; flex: 1; }
+.drawer-tab {
+  flex: 1; padding: 10px 6px; font-size: 11px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.08em;
+  background: none; border: none; color: var(--fg-muted);
+  cursor: pointer; font-family: 'Bricolage Grotesque', sans-serif;
+  transition: all 0.15s; position: relative;
+}
+.drawer-tab:hover { color: var(--fg); background: var(--surface); }
+.drawer-tab.active { color: var(--accent); }
+.drawer-tab.active::after {
+  content: ''; position: absolute; bottom: 0; left: 20%; right: 20%;
+  height: 2px; background: var(--accent); border-radius: 1px;
+}
+.drawer-close {
+  width: 36px; border: none; background: none;
+  cursor: pointer; color: var(--fg-muted); display: flex;
+  align-items: center; justify-content: center; font-size: 16px;
+  transition: all 0.15s;
+}
+.drawer-close:hover { color: var(--fg); background: var(--surface); }
+.drawer-body { flex: 1; overflow: hidden; display: flex; flex-direction: column; min-height: 0; }
+.tab-content { display: none; flex-direction: column; height: 100%; overflow: hidden; }
+.tab-content.active { display: flex; }
+.tab-scroll { flex: 1; overflow-y: auto; padding: 16px; }
+
+/* Presets tab */
 .preset-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .preset-card {
   background: var(--surface); border: 1px solid var(--border);
@@ -290,45 +337,54 @@ body::before {
 .preset-card-sm { padding: 6px 4px; gap: 2px; border-radius: var(--radius-sm); }
 .preset-card-sm .preset-name { font-size: 10px; }
 .preset-cat-tag { font-size: 8px; color: var(--fg-dim); text-transform: uppercase; letter-spacing: 0.03em; }
+
+/* Settings tab */
 .control { margin-bottom: 14px; }
 .control:last-child { margin-bottom: 0; }
 .control-label { display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--fg-muted); margin-bottom: 8px; font-weight: 500; }
 .control-value { font-family: 'JetBrains Mono', monospace; color: var(--fg); font-weight: 500; background: var(--surface); padding: 2px 7px; border-radius: 4px; font-size: 11px; border: 1px solid var(--border); }
 .control-hidden { display: none; }
-input[type="range"] {
-  width: 100%; height: 4px; background: var(--surface-2);
-  border-radius: 2px; -webkit-appearance: none; appearance: none;
-  outline: none; cursor: pointer;
-}
-input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none; appearance: none;
-  width: 16px; height: 16px; background: var(--accent);
-  border-radius: 50%; cursor: pointer;
-  border: 3px solid var(--bg-elevated);
-  box-shadow: 0 0 0 1px var(--accent), 0 2px 8px var(--accent-glow);
-  transition: transform 0.15s;
-}
+input[type="range"] { width: 100%; height: 4px; background: var(--surface-2); border-radius: 2px; -webkit-appearance: none; appearance: none; outline: none; cursor: pointer; }
+input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 16px; height: 16px; background: var(--accent); border-radius: 50%; cursor: pointer; border: 3px solid var(--bg-elevated); box-shadow: 0 0 0 1px var(--accent), 0 2px 8px var(--accent-glow); transition: transform 0.15s; }
 input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.2); }
 input[type="range"]::-moz-range-thumb { width: 16px; height: 16px; background: var(--accent); border-radius: 50%; cursor: pointer; border: 3px solid var(--bg-elevated); box-shadow: 0 0 0 1px var(--accent); }
-.selector-group {
-  display: grid; grid-template-columns: repeat(4, 1fr); gap: 3px;
-  background: var(--surface-2); padding: 3px; border-radius: var(--radius-sm);
-  border: 1px solid var(--border);
-}
+.selector-group { display: grid; grid-template-columns: repeat(4, 1fr); gap: 3px; background: var(--surface-2); padding: 3px; border-radius: var(--radius-sm); border: 1px solid var(--border); }
 .selector-group.two-col { grid-template-columns: 1fr 1fr; }
-.selector-btn {
-  padding: 6px 4px; font-size: 11px; font-weight: 500;
-  background: transparent; border: none; color: var(--fg-muted);
-  cursor: pointer; border-radius: 4px; transition: all 0.15s; font-family: 'DM Sans', sans-serif;
-}
+.selector-btn { padding: 6px 4px; font-size: 11px; font-weight: 500; background: transparent; border: none; color: var(--fg-muted); cursor: pointer; border-radius: 4px; transition: all 0.15s; font-family: 'DM Sans', sans-serif; }
 .selector-btn:hover { color: var(--fg); }
 .selector-btn.active { background: var(--accent); color: white; box-shadow: 0 2px 6px var(--accent-glow); }
-.actions { display: flex; flex-direction: column; gap: 8px; padding: 16px; border-top: 1px solid var(--border); background: var(--bg-elevated); flex-shrink: 0; }
-.actions-row { display: flex; gap: 8px; }
-.actions .btn { flex: 1; padding: 10px 12px; font-size: 13px; }
+
+/* Drawer actions */
+.drawer-actions { padding: 16px; border-top: 1px solid var(--border); background: var(--bg-elevated); flex-shrink: 0; }
+.drawer-actions .btn { width: 100%; margin-bottom: 6px; }
+.drawer-actions .btn:last-child { margin-bottom: 0; }
+.drawer-actions-row { display: flex; gap: 6px; margin-bottom: 6px; }
+.drawer-actions-row .btn { flex: 1; }
+.drawer-actions-row:last-child { margin-bottom: 0; }
 .btn-run { background: var(--accent-2); color: #0a0b10; border-color: var(--accent-2); font-weight: 600; box-shadow: 0 4px 14px var(--accent-2-soft); }
 .btn-run:hover { background: var(--accent-2-hover); border-color: var(--accent-2-hover); transform: translateY(-1px); box-shadow: 0 6px 20px var(--accent-2-soft); }
 .btn-run:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+/* Elements tab */
+.element-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 10px 12px; margin-bottom: 6px;
+  display: flex; align-items: center; gap: 10px;
+}
+.element-card:last-child { margin-bottom: 0; }
+.element-card .elem-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.element-card .elem-info { flex: 1; min-width: 0; }
+.element-card .elem-name { font-size: 12px; font-weight: 500; color: var(--fg); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.element-card .elem-tag { font-size: 10px; color: var(--fg-dim); }
+.element-card .elem-badge { font-size: 10px; background: var(--accent-soft); color: var(--accent); padding: 2px 8px; border-radius: 8px; font-weight: 500; white-space: nowrap; }
+.element-card .elem-details { font-size: 10px; color: var(--fg-muted); display: flex; gap: 6px; flex-wrap: wrap; margin-top: 2px; }
+.element-card .elem-details span { background: var(--surface-2); padding: 1px 6px; border-radius: 4px; }
+.element-card .elem-clear {
+  background: none; border: none; color: var(--fg-dim); cursor: pointer;
+  padding: 4px; border-radius: 4px; font-size: 12px; line-height: 1; transition: all 0.15s;
+  flex-shrink: 0;
+}
+.element-card .elem-clear:hover { color: var(--danger); }
 .toast-container { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 100; display: flex; flex-direction: column; gap: 8px; pointer-events: none; align-items: center; }
 .toast {
   background: var(--surface-2); color: var(--fg);
@@ -385,8 +441,8 @@ textarea:focus { border-color: var(--accent); }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--fg-dim); }
-@media (max-width: 1200px) { .right-panel { width: 300px; } .shortcut-hint { display: none; } }
-@media (max-width: 900px) { .sidebar { width: 240px; } .right-panel { width: 280px; } .logo-sub { display: none; } }
+@media (max-width: 1200px) { .right-panel { width: 360px; } .drawer-toggle.open { right: 360px; } .shortcut-hint { display: none; } }
+@media (max-width: 900px) { .sidebar { width: 240px; } .right-panel { width: 320px; } .drawer-toggle.open { right: 320px; } .logo-sub { display: none; } }
 </style>
 </head>
 <body>
@@ -477,85 +533,101 @@ textarea:focus { border-color: var(--accent); }
       <div class="canvas-wrap" id="canvasWrap">
         <div class="svg-canvas" id="svgCanvas"></div>
       </div>
+      <button class="drawer-toggle" id="drawerToggle" title="Toggle panel">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
     </section>
 
-    <aside class="right-panel">
-      <div class="panel-section">
-        <div class="section-title"><span>Animation Presets</span></div>
-        <div class="preset-grid" id="presetGrid"></div>
+    <aside class="right-panel" id="rightPanel">
+      <div class="drawer-header">
+        <div class="drawer-tabs">
+          <button class="drawer-tab active" data-tab="presets">Presets</button>
+          <button class="drawer-tab" data-tab="settings">Settings</button>
+          <button class="drawer-tab" data-tab="elements">Elements</button>
+        </div>
+        <button class="drawer-close" id="drawerClose">✕</button>
       </div>
-
-      <div class="panel-section scrollable">
-        <div class="section-title"><span>Settings</span></div>
-
-        <div class="control">
-          <div class="control-label">
-            <span>Duration</span>
-            <span class="control-value" id="durationValue">0.6s</span>
-          </div>
-          <input type="range" id="durationSlider" min="0.1" max="3" step="0.1" value="0.6">
-        </div>
-
-        <div class="control">
-          <div class="control-label">
-            <span>Delay</span>
-            <span class="control-value" id="delayValue">0.0s</span>
-          </div>
-          <input type="range" id="delaySlider" min="0" max="2" step="0.1" value="0">
-        </div>
-
-        <div class="control control-hidden" id="staggerControl">
-          <div class="control-label">
-            <span>Stagger (between elements)</span>
-            <span class="control-value" id="staggerValue">0ms</span>
-          </div>
-          <input type="range" id="staggerSlider" min="0" max="500" step="10" value="0">
-        </div>
-
-        <div class="control">
-          <div class="control-label"><span>Repeat</span></div>
-          <div class="selector-group">
-            <button class="selector-btn active" data-repeat="1">Once</button>
-            <button class="selector-btn" data-repeat="2">Twice</button>
-            <button class="selector-btn" data-repeat="3">3×</button>
-            <button class="selector-btn" data-repeat="infinite">Loop</button>
+      <div class="drawer-body">
+        <div class="tab-content active" id="tabPresets">
+          <div class="tab-scroll">
+            <div class="preset-grid" id="presetGrid"></div>
           </div>
         </div>
-
-        <div class="control">
-          <div class="control-label"><span>Easing</span></div>
-          <div class="selector-group two-col">
-            <button class="selector-btn active" data-easing="ease">Ease</button>
-            <button class="selector-btn" data-easing="ease-in-out">Ease in-out</button>
-            <button class="selector-btn" data-easing="bounce">Bounce</button>
-            <button class="selector-btn" data-easing="linear">Linear</button>
+        <div class="tab-content" id="tabSettings">
+          <div class="tab-scroll">
+            <div class="control">
+              <div class="control-label">
+                <span>Duration</span>
+                <span class="control-value" id="durationValue">0.6s</span>
+              </div>
+              <input type="range" id="durationSlider" min="0.1" max="3" step="0.1" value="0.6">
+            </div>
+            <div class="control">
+              <div class="control-label">
+                <span>Delay</span>
+                <span class="control-value" id="delayValue">0.0s</span>
+              </div>
+              <input type="range" id="delaySlider" min="0" max="2" step="0.1" value="0">
+            </div>
+            <div class="control control-hidden" id="staggerControl">
+              <div class="control-label">
+                <span>Stagger (between elements)</span>
+                <span class="control-value" id="staggerValue">0ms</span>
+              </div>
+              <input type="range" id="staggerSlider" min="0" max="500" step="10" value="0">
+            </div>
+            <div class="control">
+              <div class="control-label"><span>Repeat</span></div>
+              <div class="selector-group">
+                <button class="selector-btn active" data-repeat="1">Once</button>
+                <button class="selector-btn" data-repeat="2">Twice</button>
+                <button class="selector-btn" data-repeat="3">3×</button>
+                <button class="selector-btn" data-repeat="infinite">Loop</button>
+              </div>
+            </div>
+            <div class="control">
+              <div class="control-label"><span>Easing</span></div>
+              <div class="selector-group two-col">
+                <button class="selector-btn active" data-easing="ease">Ease</button>
+                <button class="selector-btn" data-easing="ease-in-out">Ease in-out</button>
+                <button class="selector-btn" data-easing="bounce">Bounce</button>
+                <button class="selector-btn" data-easing="linear">Linear</button>
+              </div>
+            </div>
+          </div>
+          <div class="drawer-actions">
+            <button class="btn btn-primary btn-sm" id="assignBtn" style="font-size:12px;padding:6px 12px;width:100%">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              Assign to Element
+            </button>
+            <button class="btn btn-run" id="runBtn">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+              Run Animation
+            </button>
+            <div class="drawer-actions-row">
+              <button class="btn btn-ghost" id="resetBtn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+                Reset
+              </button>
+              <button class="btn btn-secondary" id="exportCssBtn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                Export CSS
+              </button>
+            </div>
+            <button class="btn btn-secondary" id="exportLottieBtn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Export Lottie JSON
+            </button>
           </div>
         </div>
-      </div>
-
-      <div class="actions">
-        <button class="btn btn-primary btn-sm" id="assignBtn" style="font-size:12px;padding:6px 12px;width:100%">
-          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-          Assign to Element
-        </button>
-        <button class="btn btn-run" id="runBtn">
-          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-          Run Animation
-        </button>
-        <div class="actions-row">
-          <button class="btn btn-ghost" id="resetBtn">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
-            Reset
-          </button>
-          <button class="btn btn-secondary" id="exportCssBtn">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-            Export CSS
-          </button>
+        <div class="tab-content" id="tabElements">
+          <div class="tab-scroll" id="elementAssignmentsList">
+            <div class="empty-state">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              <div>No elements loaded.</div>
+            </div>
+          </div>
         </div>
-        <button class="btn btn-secondary" id="exportLottieBtn">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          Export Lottie JSON
-        </button>
       </div>
     </aside>
   </main>
@@ -1669,6 +1741,81 @@ createGroupBtn.addEventListener('click', createGroup);
     icon.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
   }
 });
+
+// ===== Drawer toggle =====
+const rightPanel = $('#rightPanel');
+const drawerToggle = $('#drawerToggle');
+const drawerClose = $('#drawerClose');
+function openDrawer() { rightPanel.classList.add('open'); drawerToggle.classList.add('open'); }
+function closeDrawer() { rightPanel.classList.remove('open'); drawerToggle.classList.remove('open'); }
+drawerToggle.addEventListener('click', () => {
+  if (rightPanel.classList.contains('open')) closeDrawer(); else openDrawer();
+});
+drawerClose.addEventListener('click', closeDrawer);
+
+// ===== Tab switching =====
+document.querySelectorAll('.drawer-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.drawer-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+    tab.classList.add('active');
+    const target = document.getElementById('tab' + tab.dataset.tab.charAt(0).toUpperCase() + tab.dataset.tab.slice(1));
+    if (target) target.classList.add('active');
+    if (tab.dataset.tab === 'elements') renderElementAssignments();
+  });
+});
+
+// ===== Render element assignments (Elements tab) =====
+function renderElementAssignments() {
+  const container = $('#elementAssignmentsList');
+  if (!container) return;
+  if (!state.elements || state.elements.length === 0) {
+    container.innerHTML = `<div class="empty-state">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <div>No elements loaded.</div>
+    </div>`;
+    return;
+  }
+  container.innerHTML = '';
+  state.elements.forEach((item, idx) => {
+    const anim = state.elementAnimations[idx];
+    const card = document.createElement('div');
+    card.className = 'element-card';
+    const badgeHtml = anim
+      ? `<span class="elem-badge">${PRESETS[anim.preset]?.name || anim.preset}</span>`
+      : `<span class="elem-badge" style="background:var(--surface-2);color:var(--fg-dim);font-weight:400;">—</span>`;
+    const detailsHtml = anim
+      ? `<div class="elem-details"><span>${anim.duration.toFixed(1)}s</span><span>d:${anim.delay.toFixed(1)}s</span><span>r:${anim.repeat}</span><span>${anim.easing}</span></div>`
+      : '';
+    card.innerHTML = `
+      <div class="elem-dot" style="background:${item.color}"></div>
+      <div class="elem-info">
+        <div class="elem-name">${item.name}</div>
+        <div class="elem-tag">${item.tag}</div>
+        ${detailsHtml}
+      </div>
+      ${badgeHtml}
+      ${anim ? `<button class="elem-clear" data-idx="${idx}" title="Clear animation">✕</button>` : ''}`;
+    container.appendChild(card);
+  });
+  container.querySelectorAll('.elem-clear').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const idx = parseInt(btn.dataset.idx);
+      delete state.elementAnimations[idx];
+      renderElementsList();
+      renderElementAssignments();
+      showToast('Animation cleared', 'success');
+    });
+  });
+}
+
+// Patch renderElementsList to also update Elements tab
+const _origRenderElementsList = renderElementsList;
+renderElementsList = function() {
+  _origRenderElementsList();
+  renderElementAssignments();
+};
 
 // ===== Canvas click → select element =====
 svgCanvas.addEventListener('click', (e) => {
