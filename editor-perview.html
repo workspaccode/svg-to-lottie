@@ -1391,10 +1391,18 @@ function highlightCSS(css) {
   showToast('Lottie JSON exported', 'success');
 });
 
-function parseLottieColor(hex) {
-  if (!hex || hex === 'none') return [0, 0, 0, 0];
-  const v = hex.replace('#', '');
-  return [parseInt(v.substring(0, 2), 16) / 255, parseInt(v.substring(2, 4), 16) / 255, parseInt(v.substring(4, 6), 16) / 255, 1];
+function parseLottieColor(val) {
+  if (!val || val === 'none') return [0, 0, 0, 0];
+  const named = { red:[1,0,0,1], green:[0,0.5,0,1], blue:[0,0,1,1], white:[1,1,1,1], black:[0,0,0,1], yellow:[1,1,0,1], cyan:[0,1,1,1], magenta:[1,0,1,1], orange:[1,0.65,0,1], purple:[0.5,0,0.5,1], pink:[1,0.75,0.8,1], gray:[0.5,0.5,0.5,1], transparent:[0,0,0,0], currentcolor:[1,1,1,1] };
+  const lower = val.trim().toLowerCase();
+  if (named[lower]) return named[lower];
+  if (lower.startsWith('url(')) return [1,1,1,1];
+  if (lower.startsWith('rgb')) {
+    const m = lower.match(/[\d.]+/g);
+    if (m) return [parseInt(m[0])/255, parseInt(m[1])/255, parseInt(m[2])/255, 1];
+  }
+  const v = val.replace('#', '');
+  return [parseInt(v.substring(0, 2), 16) / 255 || 0, parseInt(v.substring(2, 4), 16) / 255 || 0, parseInt(v.substring(4, 6), 16) / 255 || 0, 1];
 }
 
 function getElementBounds(el) {
@@ -1494,10 +1502,31 @@ function svgPathToLottie(d) {
         cx=qx2;cy=qy2;addV(cx,cy,p0[0]-cx2,p0[1]-cy2,0,0);i=ti;break;
       }
       case 'A': case 'a': {
-        const [av,ai]=pC(d,i,7);const rx=av[0],ry=av[1];
+        const [av,ai]=pC(d,i,7);const rx=Math.abs(av[0]),ry=Math.abs(av[1]),xRot=av[2]*Math.PI/180;
+        const laf=av[3],sf=av[4];
         let ex=av[5],ey=av[6];
         if(cmd==='a'){ex+=cx;ey+=cy;}
-        for(let k=1;k<=16;k++){const t=k/16;addV(ex+rx*Math.cos(t*Math.PI*2),ey+ry*Math.sin(t*Math.PI*2),0,0,0,0);}
+        if(rx<0.01||ry<0.01){addV(cx,cy,0,0,0,0);cx=ex;cy=ey;i=ai;break;}
+        // SVG arc → center parameterization
+        const dx=(cx-ex)/2,dy=(cy-ey)/2;
+        const cosR=Math.cos(xRot),sinR=Math.sin(xRot);
+        const x1p=cosR*dx+sinR*dy,y1p=-sinR*dx+cosR*dy;
+        const rx2=rx*rx,ry2=ry*ry,x1p2=x1p*x1p,y1p2=y1p*y1p;
+        let rad=Math.sqrt(Math.max(0,(rx2*ry2-rx2*y1p2-ry2*x1p2)/(rx2*y1p2+ry2*x1p2)));
+        if(laf===sf)rad=-rad;
+        const cxp=rad*rx*y1p/ry,cyp=-rad*ry*x1p/rx;
+        const ccx=cosR*cxp-sinR*cyp+(cx+ex)/2,ccy=sinR*cxp+cosR*cyp+(cy+ey)/2;
+        const startA=Math.atan2((y1p-cyp)/ry,(x1p-cxp)/rx),endA=Math.atan2((-y1p-cyp)/ry,(-x1p-cxp)/rx);
+        let da=endA-startA;
+        if(sf===0&&da>0)da-=2*Math.PI;
+        if(sf===1&&da<0)da+=2*Math.PI;
+        const segs=Math.max(4,Math.ceil(Math.abs(da)/(Math.PI/4)));
+        for(let k=1;k<=segs;k++){
+          const t=k/segs,a=startA+da*t;
+          const px=ccx+rx*cosR*Math.cos(a)-ry*sinR*Math.sin(a);
+          const py=ccy+rx*sinR*Math.cos(a)+ry*cosR*Math.sin(a);
+          addV(px,py,0,0,0,0);
+        }
         cx=ex;cy=ey;i=ai;break;
       }
       case 'Z':case 'z':{close();cx=sx;cy=sy;break;}
@@ -1576,17 +1605,19 @@ function buildLottieShape(el) {
 function buildLottieTransform(anim, bounds) {
   const preset = PRESETS[anim.preset];
   if (!preset) return null;
-  const dur = anim.duration;
-  const delay = anim.delay;
+  const fr = 60;
+  const delayFr = Math.round(anim.delay * fr);
+  const durFr = Math.round(anim.duration * fr);
   const cx = bounds.cx, cy = bounds.cy;
-  const easeMap = { 'ease': [0.66, 0, 0.34, 1], 'ease-in-out': [0.5, 0, 0.5, 1], 'bounce': [0.68, -0.55, 0.27, 1.55], 'linear': [0, 0, 1, 1] };
-  const e = easeMap[anim.easing] || easeMap.ease;
+  const easeMap = { 'ease': { x: [0.66], y: [0] }, 'ease-in-out': { x: [0.5], y: [0] }, 'bounce': { x: [0.68], y: [-0.55] }, 'linear': { x: [0], y: [0] } };
+  const easeOutMap = { 'ease': { x: [0.34], y: [1] }, 'ease-in-out': { x: [0.5], y: [1] }, 'bounce': { x: [0.27], y: [1.55] }, 'linear': { x: [1], y: [1] } };
+  const ei = easeMap[anim.easing] || easeMap.ease;
+  const eo = easeOutMap[anim.easing] || easeOutMap.ease;
 
   function mkKF(vals, mult) {
-    const total = delay + dur;
     return vals.map((v, idx) => {
-      const t = delay + (idx / (vals.length - 1 || 1)) * dur;
-      return { t: t / total, s: [typeof v === 'number' ? v * (mult || 1) : v], e: e, i: { x: [e[0]], y: [e[1]] }, o: { x: [e[2]], y: [e[3]] } };
+      const t = delayFr + Math.round((idx / (vals.length - 1 || 1)) * durFr);
+      return { t, s: [typeof v === 'number' ? v * (mult || 1) : v], i: { x: [ei.x[0]], y: [ei.y[0]] }, o: { x: [eo.x[0]], y: [eo.y[0]] } };
     });
   }
 
@@ -1600,26 +1631,37 @@ function buildLottieTransform(anim, bounds) {
   const hasOpacity = kf.opacity?.some(v => v !== 1);
   const hasSkew = kf.skewX?.some(v => v !== 0);
 
+  function posKF(xVals, yVals) {
+    const len = Math.max(xVals.length, yVals.length);
+    return Array.from({length: len}, (_, idx) => ({
+      t: delayFr + Math.round((idx / (len - 1 || 1)) * durFr),
+      s: [(xVals[idx] ?? 0) + cx, (yVals[idx] ?? 0) + cy, 0],
+      i: { x: [ei.x[0]], y: [ei.y[0]] },
+      o: { x: [eo.x[0]], y: [eo.y[0]] },
+      to: [0, 0], ti: [0, 0]
+    }));
+  }
+
+
+
   return {
     anchor: [cx, cy, 0],
-    position: {
-      a: 0,
-      k: hasX || hasY ? [
-        { t: 0, s: [(kf.x?.[0] ?? 0) + cx, (kf.y?.[0] ?? 0) + cy, 0], e, i: { x: [e[0]], y: [e[1]] }, o: { x: [e[2]], y: [e[3]] } },
-        { t: 1, s: [(kf.x?.[kf.x.length-1] ?? 0) + cx, (kf.y?.[kf.y.length-1] ?? 0) + cy, 0], e, i: { x: [e[0]], y: [e[1]] }, o: { x: [e[2]], y: [e[3]] } }
-      ] : [cx, cy, 0]
-    },
-    scale: {
-      a: 0,
-      k: hasScale ? mkKF(kf.scale, 100) :
-        hasScaleX || hasScaleY ? [
-          { t: 0, s: [(kf.scaleX?.[0] ?? 1) * 100, (kf.scaleY?.[0] ?? 1) * 100, 100], e, i: { x: [e[0]], y: [e[1]] }, o: { x: [e[2]], y: [e[3]] } },
-          { t: 1, s: [(kf.scaleX?.[kf.scaleX.length-1] ?? 1) * 100, (kf.scaleY?.[kf.scaleY.length-1] ?? 1) * 100, 100], e, i: { x: [e[0]], y: [e[1]] }, o: { x: [e[2]], y: [e[3]] } }
-        ] : [100, 100, 100]
-    },
-    rotation: { a: 0, k: hasRot ? mkKF(kf.rotation) : [0] },
-    opacity: { a: 0, k: hasOpacity ? mkKF(kf.opacity) : [100] },
-    skew: hasSkew ? { a: 0, k: mkKF(kf.skewX) } : undefined,
+    position: hasX || hasY
+      ? { a: 1, k: posKF(kf.x || [0,0], kf.y || [0,0]) }
+      : { a: 0, k: [cx, cy, 0] },
+    scale: hasScale
+      ? { a: 1, k: mkKF(kf.scale, 100) }
+      : hasScaleX || hasScaleY
+        ? { a: 1, k: (kf.scaleX || kf.scaleY).map((_, idx) => ({
+            t: delayFr + Math.round((idx / ((kf.scaleX||kf.scaleY).length - 1 || 1)) * durFr),
+            s: [(kf.scaleX?.[idx] ?? 1) * 100, (kf.scaleY?.[idx] ?? 1) * 100, 100],
+            i: { x: [ei.x[0]], y: [ei.y[0]] },
+            o: { x: [eo.x[0]], y: [eo.y[0]] }
+          })) }
+        : { a: 0, k: [100, 100, 100] },
+    rotation: hasRot ? { a: 1, k: mkKF(kf.rotation) } : { a: 0, k: [0] },
+    opacity: hasOpacity ? { a: 1, k: mkKF(kf.opacity.map(v => v * 100)) } : { a: 0, k: [100] },
+    skew: hasSkew ? { a: 1, k: mkKF(kf.skewX) } : undefined,
     skewAxis: hasSkew ? { a: 0, k: [0] } : undefined,
   };
 }
