@@ -1013,13 +1013,199 @@
 
         .reveal {
             opacity: 0;
-            transform: translateY(24px);
-            transition: opacity 0.6s ease, transform 0.6s ease
+            transition: opacity 0.7s cubic-bezier(0.32, 0.72, 0, 1),
+                transform 0.7s cubic-bezier(0.32, 0.72, 0, 1)
         }
 
         .reveal.visible {
             opacity: 1;
-            transform: translateY(0)
+            transform: translateY(0) scale(1) rotate(0deg) translateX(0)
+        }
+
+        .reveal[data-animate="fade"] {
+            transform: none
+        }
+
+        .reveal[data-animate="slide-up"] {
+            transform: translateY(40px)
+        }
+
+        .reveal[data-animate="slide-down"] {
+            transform: translateY(-40px)
+        }
+
+        .reveal[data-animate="slide-left"] {
+            transform: translateX(40px)
+        }
+
+        .reveal[data-animate="slide-right"] {
+            transform: translateX(-40px)
+        }
+
+        .reveal[data-animate="scale"] {
+            transform: scale(0.85)
+        }
+
+        .reveal[data-animate="scale-up"] {
+            transform: scale(0.7) translateY(20px)
+        }
+
+        .reveal[data-animate="flip-x"] {
+            transform: perspective(800px) rotateX(15deg) translateY(20px)
+        }
+
+        .reveal[data-animate="flip-y"] {
+            transform: perspective(800px) rotateY(15deg)
+        }
+
+        .reveal[data-animate="blur-in"] {
+            transform: translateY(16px);
+            filter: blur(6px);
+            transition: opacity 0.7s cubic-bezier(0.32, 0.72, 0, 1),
+                transform 0.7s cubic-bezier(0.32, 0.72, 0, 1),
+                filter 0.7s cubic-bezier(0.32, 0.72, 0, 1)
+        }
+
+        .reveal[data-animate="blur-in"].visible {
+            filter: blur(0)
+        }
+
+        .reveal[data-animate="bounce-up"] {
+            transform: translateY(60px)
+        }
+
+        .reveal[data-animate="bounce-up"].visible {
+            animation: bounceUp 0.7s cubic-bezier(0.32, 0.72, 0, 1) forwards
+        }
+
+        @keyframes bounceUp {
+            0% {
+                opacity: 1;
+                transform: translateY(60px)
+            }
+            60% {
+                transform: translateY(-8px)
+            }
+            80% {
+                transform: translateY(4px)
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        .click-animate {
+            cursor: pointer;
+            transition: transform 0.2s cubic-bezier(0.32, 0.72, 0, 1),
+                box-shadow 0.2s cubic-bezier(0.32, 0.72, 0, 1)
+        }
+
+        .click-animate:active {
+            transform: scale(0.97)
+        }
+
+        /* stagger children — each child gets a growing delay */
+        [data-stagger]>.reveal {
+            transition-delay: 0ms !important
+        }
+
+        [data-stagger].stagger-visible>.reveal.visible {
+            opacity: 1;
+            transform: translateY(0) scale(1) rotate(0deg) translateX(0)
+        }
+
+        [data-stagger].stagger-visible>.reveal[data-animate="blur-in"].visible {
+            filter: blur(0)
+        }
+
+        .pulse {
+            animation: pulse 1.4s cubic-bezier(0.32, 0.72, 0, 1)
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1)
+            }
+            25% {
+                transform: scale(1.06)
+            }
+            50% {
+                transform: scale(0.98)
+            }
+            75% {
+                transform: scale(1.02)
+            }
+            100% {
+                transform: scale(1)
+            }
+        }
+
+        .shake {
+            animation: shake 0.5s cubic-bezier(0.32, 0.72, 0, 1)
+        }
+
+        @keyframes shake {
+            0%,
+            100% {
+                transform: translateX(0)
+            }
+            20% {
+                transform: translateX(-6px)
+            }
+            40% {
+                transform: translateX(6px)
+            }
+            60% {
+                transform: translateX(-4px)
+            }
+            80% {
+                transform: translateX(4px)
+            }
+        }
+
+        .glow {
+            animation: glow 1.2s ease forwards
+        }
+
+        @keyframes glow {
+            0% {
+                box-shadow: 0 0 0 0 rgba(255, 95, 95, 0.5)
+            }
+            70% {
+                box-shadow: 0 0 20px 8px rgba(255, 95, 95, 0)
+            }
+            100% {
+                box-shadow: none
+            }
+        }
+
+        .pop {
+            animation: pop 0.45s cubic-bezier(0.32, 0.72, 0, 1)
+        }
+
+        @keyframes pop {
+            0% {
+                transform: scale(0.9)
+            }
+            50% {
+                transform: scale(1.08)
+            }
+            100% {
+                transform: scale(1)
+            }
+        }
+
+        .stat-num.clickable,
+        .stat-item.clickable,
+        .feature-card.clickable,
+        .pricing-card.clickable {
+            cursor: pointer
+        }
+
+        .stat-num.clickable:hover,
+        .stat-item.clickable:hover {
+            opacity: 0.8
         }
     </style>
 </head>
@@ -1095,12 +1281,12 @@
 
     <section id="features" class="features">
         <div class="container">
-            <div class="section-label reveal">What you get</div>
-            <h2 class="section-title reveal">Everything you need to build better products</h2>
-            <p class="section-desc reveal">From design to deployment — a unified platform that scales with your team.
+                <div class="section-label reveal" data-animate="slide-down">What you get</div>
+            <h2 class="section-title reveal" data-animate="slide-up">Everything you need to build better products</h2>
+            <p class="section-desc reveal" data-animate="fade">From design to deployment — a unified platform that scales with your team.
             </p>
-            <div class="feature-grid">
-                <div class="feature-card reveal">
+            <div class="feature-grid" data-stagger>
+                <div class="feature-card reveal" data-animate="slide-up">
                     <div class="icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                             stroke-linecap="round" stroke-linejoin="round">
@@ -1114,7 +1300,7 @@
                         screen size — no code required.</p>
                     <span class="feature-tag">New</span>
                 </div>
-                <div class="feature-card reveal">
+                <div class="feature-card reveal" data-animate="scale">
                     <div class="icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                             stroke-linecap="round" stroke-linejoin="round">
@@ -1128,7 +1314,7 @@
                     <p>Co-edit designs with your team in real time. Comment, review, and iterate without
                         context-switching between tools.</p>
                 </div>
-                <div class="feature-card reveal">
+                <div class="feature-card reveal" data-animate="slide-left">
                     <div class="icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                             stroke-linecap="round" stroke-linejoin="round">
@@ -1140,7 +1326,7 @@
                     <p>Set up triggers for exports, handoffs, and deployments. Push to production straight from the
                         editor — version-controlled.</p>
                 </div>
-                <div class="feature-card reveal">
+                <div class="feature-card reveal" data-animate="flip-x">
                     <div class="icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                             stroke-linecap="round" stroke-linejoin="round">
@@ -1185,9 +1371,9 @@
 
     <section class="stats">
         <div class="container">
-            <h2 class="section-title reveal">Trusted by product teams worldwide</h2>
-            <p class="section-desc reveal">Used by 2,400+ companies from startup to enterprise.</p>
-            <div class="stats-grid reveal">
+            <h2 class="section-title reveal" data-animate="slide-down">Trusted by product teams worldwide</h2>
+            <p class="section-desc reveal" data-animate="fade">Used by 2,400+ companies from startup to enterprise.</p>
+            <div class="stats-grid reveal" data-stagger data-animate="scale">
                 <div class="stat-item">
                     <div class="num">2.4k<span>+</span></div>
                     <div class="label">Companies</div>
@@ -1210,12 +1396,12 @@
 
     <section id="pricing" class="pricing">
         <div class="container">
-            <div class="section-label reveal">Pricing</div>
-            <h2 class="section-title reveal">Straightforward plans for every stage</h2>
-            <p class="section-desc reveal">Start free, upgrade when you need more. All plans include a 14-day trial of
+            <div class="section-label reveal" data-animate="slide-down">Pricing</div>
+            <h2 class="section-title reveal" data-animate="slide-up">Straightforward plans for every stage</h2>
+            <p class="section-desc reveal" data-animate="fade">Start free, upgrade when you need more. All plans include a 14-day trial of
                 premium features.</p>
-            <div class="pricing-grid">
-                <div class="pricing-card reveal">
+            <div class="pricing-grid" data-stagger>
+                <div class="pricing-card reveal" data-animate="slide-left">
                     <h3>Starter</h3>
                     <div class="price">$0 <span>/ mo</span></div>
                     <p class="desc">For individuals exploring Arc Studio.</p>
@@ -1228,7 +1414,7 @@
                     </ul>
                     <button class="btn">Get Started Free</button>
                 </div>
-                <div class="pricing-card featured reveal">
+                <div class="pricing-card featured reveal" data-animate="scale-up">
                     <div class="badge">Most Popular</div>
                     <h3>Team</h3>
                     <div class="price">$29 <span>/ mo per seat</span></div>
@@ -1243,7 +1429,7 @@
                     </ul>
                     <button class="btn">Start 14-Day Trial</button>
                 </div>
-                <div class="pricing-card reveal">
+                <div class="pricing-card reveal" data-animate="slide-right">
                     <h3>Enterprise</h3>
                     <div class="price">$99 <span>/ mo per seat</span></div>
                     <p class="desc">For organisations at scale.</p>
@@ -1263,22 +1449,22 @@
 
     <section id="about" class="about">
         <div class="container">
-            <div class="section-label reveal">About</div>
+            <div class="section-label reveal" data-animate="slide-down">About</div>
             <div class="about-grid">
                 <div class="about-text">
-                    <h2 class="section-title reveal">We believe great tools make great products</h2>
-                    <p class="lead reveal">Arc Studio was founded by a team of designers and engineers who were tired of
+                    <h2 class="section-title reveal" data-animate="flip-x">We believe great tools make great products</h2>
+                    <p class="lead reveal" data-animate="slide-right">Arc Studio was founded by a team of designers and engineers who were tired of
                         bridging between disconnected tools. We built the platform we always wished existed — one that
                         treats design as a system, not a series of screens.</p>
-                    <p class="reveal">Today, our remote team spans 14 countries and ships updates every single week.
+                    <p class="reveal" data-animate="fade">Today, our remote team spans 14 countries and ships updates every single week.
                         We're backed by First Round Capital and Sequoia, but we answer to our users — the thousands of
                         product teams who trust us with their daily workflow.</p>
-                    <p class="reveal">We're intentionally small, intentionally focused, and we're in this for the long
+                    <p class="reveal" data-animate="fade">We're intentionally small, intentionally focused, and we're in this for the long
                         haul.</p>
                 </div>
                 <div>
-                    <div class="section-label reveal" style="margin-bottom:var(--space-4)">Our values</div>
-                    <div class="about-values reveal">
+                    <div class="section-label reveal" data-animate="slide-down" style="margin-bottom:var(--space-4)">Our values</div>
+                    <div class="about-values reveal" data-stagger>
                         <div class="value-item">
                             <h4>Ship daily</h4>
                             <p>Small releases over big bangs. Every improvement is a launch.</p>
@@ -1304,12 +1490,12 @@
 
     <section class="cta">
         <div class="container">
-            <h2 class="section-title reveal">Ready to ship with confidence?</h2>
-            <p class="section-desc reveal">Join 2,400+ product teams already using Arc Studio. Free for individuals,
+            <h2 class="section-title reveal" data-animate="bounce-up">Ready to ship with confidence?</h2>
+            <p class="section-desc reveal" data-animate="fade">Join 2,400+ product teams already using Arc Studio. Free for individuals,
                 powerful for teams.</p>
-            <div class="reveal">
-                <button class="btn">Start Building Free</button>
-                <button class="btn-sub">Talk to Sales →</button>
+            <div class="reveal" data-animate="scale-up">
+                <button class="btn" data-click-animate="pulse">Start Building Free</button>
+                <button class="btn-sub" data-click-animate="shake">Talk to Sales →</button>
             </div>
         </div>
     </section>
@@ -1331,17 +1517,60 @@
             document.getElementById('navLinks').classList.toggle('open');
         });
 
-        const observer = new IntersectionObserver((entries) => {
+        // ── Scroll Reveal Engine ──────────────────────────────────────────
+        const revealObserver = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
-                    entry.target.classList.add('visible');
-                    observer.unobserve(entry.target);
+                    const el = entry.target;
+                    const parent = el.closest('[data-stagger]');
+                    if (parent) {
+                        const children = [...parent.querySelectorAll('.reveal')];
+                        children.forEach((child, i) => {
+                            child.style.transitionDelay = `${i * 120}ms`;
+                            child.classList.add('visible');
+                            revealObserver.unobserve(child);
+                        });
+                        parent.classList.add('stagger-visible');
+                        revealObserver.unobserve(parent);
+                    } else {
+                        el.classList.add('visible');
+                        revealObserver.unobserve(el);
+                    }
                 }
             });
         }, { threshold: 0.12 });
 
-        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+        document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
 
+        // ── Click-Animate ─────────────────────────────────────────────────
+        document.querySelectorAll('[data-click-animate]').forEach(el => {
+            const anim = el.dataset.clickAnimate;
+            el.classList.add('click-animate');
+            el.addEventListener('click', function (e) {
+                e.stopPropagation();
+                // remove any running animation to allow re-trigger
+                this.classList.remove(anim);
+                void this.offsetWidth; // force reflow
+                this.classList.add(anim);
+                this.addEventListener('animationend', () => {
+                    this.classList.remove(anim);
+                }, { once: true });
+            });
+        });
+
+        document.querySelectorAll('.stat-num, .stat-item, .feature-card, .pricing-card').forEach(el => {
+            el.classList.add('clickable');
+            el.addEventListener('click', function () {
+                this.classList.remove('pop');
+                void this.offsetWidth;
+                this.classList.add('pop');
+                this.addEventListener('animationend', () => {
+                    this.classList.remove('pop');
+                }, { once: true });
+            });
+        });
+
+        // ── Smooth Scroll ─────────────────────────────────────────────────
         document.querySelectorAll('a[href^="#"]').forEach(a => {
             a.addEventListener('click', e => {
                 e.preventDefault();

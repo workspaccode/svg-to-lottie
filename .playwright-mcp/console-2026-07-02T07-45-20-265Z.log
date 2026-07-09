@@ -1,0 +1,33 @@
+[   15104ms] [LOG] [Amplitude Cross-Domain] No cross-domain parameters - normal initialization @ :4
+[   15116ms] [LOG] [CleverTap] SDK loaded successfully for account: W69-48Z-857Z @ :1
+[   15260ms] [LOG] [Link Decorator] Amplitude detected, enabling cross-domain support @ :5
+[   15261ms] [LOG] [Link Decorator] Decorated 46 out of 47 links @ :3
+[   15261ms] [LOG] [Link Decorator] Cross-domain targets found: 6 @ :3
+[   15261ms] [LOG] [Link Decorator] Parameters forwarded: {gl_source: landingpage} @ :3
+[   15261ms] [LOG] [Link Decorator] Initialization complete with Amplitude cross-domain support @ :5
+[   15994ms] [LOG] [Amplitude Cross-Domain] IDs captured for forwarding: {amp_device_id: 00bf708e-044b-48a3-b76a-c81df24f6d99} @ :1
+[   15994ms] [LOG] [Link Decorator] Cross-domain link enhanced with Amplitude IDs: ksa.paymob.com @ :2
+[   15994ms] [LOG] [Amplitude Cross-Domain] IDs captured for forwarding: {amp_device_id: 00bf708e-044b-48a3-b76a-c81df24f6d99} @ :1
+[   15994ms] [LOG] [Link Decorator] Cross-domain link enhanced with Amplitude IDs: ksa.onboarding.paymob.com @ :2
+[   15994ms] [LOG] [Amplitude Cross-Domain] IDs captured for forwarding: {amp_device_id: 00bf708e-044b-48a3-b76a-c81df24f6d99} @ :1
+[   15994ms] [LOG] [Link Decorator] Cross-domain link enhanced with Amplitude IDs: ksa.onboarding.paymob.com @ :2
+[   15994ms] [LOG] [Amplitude Cross-Domain] IDs captured for forwarding: {amp_device_id: 00bf708e-044b-48a3-b76a-c81df24f6d99} @ :1
+[   15994ms] [LOG] [Link Decorator] Cross-domain link enhanced with Amplitude IDs: ksa.onboarding.paymob.com @ :2
+[   15994ms] [LOG] [Amplitude Cross-Domain] IDs captured for forwarding: {amp_device_id: 00bf708e-044b-48a3-b76a-c81df24f6d99} @ :1
+[   15994ms] [LOG] [Link Decorator] Cross-domain link enhanced with Amplitude IDs: developers.paymob.com @ :2
+[   15994ms] [LOG] [Link Decorator] Decorated 20 out of 38 links @ :3
+[   15994ms] [LOG] [Link Decorator] Cross-domain targets found: 5 @ :3
+[   15994ms] [LOG] [Link Decorator] Parameters forwarded: {gl_source: landingpage} @ :3
+[   16622ms] [LOG] [Amplitude Cross-Domain] IDs captured for forwarding: {amp_device_id: 00bf708e-044b-48a3-b76a-c81df24f6d99} @ :1
+[   16623ms] [LOG] [Link Decorator] Cross-domain link enhanced with Amplitude IDs: ksa.paymob.com @ :2
+[   16623ms] [LOG] [Amplitude Cross-Domain] IDs captured for forwarding: {amp_device_id: 00bf708e-044b-48a3-b76a-c81df24f6d99} @ :1
+[   16623ms] [LOG] [Link Decorator] Cross-domain link enhanced with Amplitude IDs: ksa.onboarding.paymob.com @ :2
+[   16623ms] [LOG] [Amplitude Cross-Domain] IDs captured for forwarding: {amp_device_id: 00bf708e-044b-48a3-b76a-c81df24f6d99} @ :1
+[   16623ms] [LOG] [Link Decorator] Cross-domain link enhanced with Amplitude IDs: ksa.onboarding.paymob.com @ :2
+[   16623ms] [LOG] [Amplitude Cross-Domain] IDs captured for forwarding: {amp_device_id: 00bf708e-044b-48a3-b76a-c81df24f6d99} @ :1
+[   16623ms] [LOG] [Link Decorator] Cross-domain link enhanced with Amplitude IDs: ksa.onboarding.paymob.com @ :2
+[   16623ms] [LOG] [Amplitude Cross-Domain] IDs captured for forwarding: {amp_device_id: 00bf708e-044b-48a3-b76a-c81df24f6d99} @ :1
+[   16623ms] [LOG] [Link Decorator] Cross-domain link enhanced with Amplitude IDs: developers.paymob.com @ :2
+[   16624ms] [LOG] [Link Decorator] Decorated 4 out of 42 links @ :3
+[   16624ms] [LOG] [Link Decorator] Cross-domain targets found: 5 @ :3
+[   16624ms] [LOG] [Link Decorator] Parameters forwarded: {gl_source: landingpage} @ :3

@@ -1,0 +1,13 @@
+[   12368ms] [LOG] %c
+   ██████╗ ██╗████████╗███████╗███████╗
+  ██  ═══╝ ██║╚══██ ══╝██ ════╝██ ════╝
+  ██║  ███╗██║   ██║   █████╗  █████╗
+  ██║   ██║██║   ██║   ██ ══╝  ██ ══╝
+  ╚██████╔╝██║   ██║   ███████╗███████╗
+   ╚═════╝ ╚═╝   ╚═╝   ╚══════╝╚══════╝
+
+ Gitee Community release v0.16.17-community color: #bada55; @ https://e-assets.gitee.com/gitee-community-web/_next/static/chunks/cb6b2a31ac4f2517.js:2
+[   14879ms] [LOG] {"msg":"操作成功","code":200,"event_id":"2072658403488165888"} @ https://e-assets.gitee.com/gitee-community-web/_next/static/chunks/cb6b2a31ac4f2517.js:2
+[   17119ms] [ERROR] Failed to load resource: the server responded with a status of 405 (Not Allowed) @ https://so.gitee.com/?q=sungrow:0
+[   19490ms] [ERROR] Failed to load resource: the server responded with a status of 405 (Not Allowed) @ https://so.gitee.com/favicon.ico:0
+[   33085ms] [WARNING] Replay is disabled because neither `replaysSessionSampleRate` nor `replaysOnErrorSampleRate` are set. @ https://so.gitee.com/assets/index-2ad95f7a.js:23
