@@ -1,0 +1,126 @@
+- generic [ref=f4e2]:
+  - banner [ref=f4e3]:
+    - generic [ref=f4e4]:
+      - img [ref=f4e6]
+      - generic [ref=f4e8]: SVG Animation Studio
+    - generic [ref=f4e10]:
+      - button "Start" [ref=f4e11] [cursor=pointer]:
+        - img [ref=f4e12]
+      - button [ref=f4e14] [cursor=pointer]:
+        - img [ref=f4e15]
+      - button "End" [ref=f4e17] [cursor=pointer]:
+        - img [ref=f4e18]
+      - generic [ref=f4e20]:
+        - generic [ref=f4e21]: 0.0s
+        - generic [ref=f4e22]: /
+        - generic [ref=f4e23]: 4.0s
+    - generic [ref=f4e24]:
+      - button "Import SVG" [ref=f4e25] [cursor=pointer]:
+        - img [ref=f4e26]
+        - text: Import SVG
+      - button "Paste" [ref=f4e29] [cursor=pointer]:
+        - img [ref=f4e30]
+        - text: Paste
+      - button "Export Lottie" [ref=f4e34] [cursor=pointer]:
+        - img [ref=f4e35]
+        - text: Export Lottie
+      - button "CSS" [ref=f4e38] [cursor=pointer]:
+        - img [ref=f4e39]
+        - text: CSS
+  - generic [ref=f4e42]:
+    - complementary [ref=f4e43]:
+      - generic [ref=f4e44]:
+        - generic [ref=f4e45]: Elements
+        - generic [ref=f4e46]: "23"
+      - generic [ref=f4e47]:
+        - generic [ref=f4e48] [cursor=pointer]:
+          - generic [ref=f4e50]: background
+          - generic [ref=f4e51]: rect
+        - generic [ref=f4e52] [cursor=pointer]:
+          - generic [ref=f4e54]: stars
+          - generic [ref=f4e55]: g
+        - generic [ref=f4e56] [cursor=pointer]:
+          - generic [ref=f4e58]: circle-1
+          - generic [ref=f4e59]: circle
+        - generic [ref=f4e60] [cursor=pointer]:
+          - generic [ref=f4e62]: circle-2
+          - generic [ref=f4e63]: circle
+        - generic [ref=f4e64] [cursor=pointer]:
+          - generic [ref=f4e66]: circle-3
+          - generic [ref=f4e67]: circle
+        - generic [ref=f4e68] [cursor=pointer]:
+          - generic [ref=f4e70]: circle-4
+          - generic [ref=f4e71]: circle
+        - generic [ref=f4e72] [cursor=pointer]:
+          - generic [ref=f4e74]: circle-5
+          - generic [ref=f4e75]: circle
+        - generic [ref=f4e76] [cursor=pointer]:
+          - generic [ref=f4e78]: circle-6
+          - generic [ref=f4e79]: circle
+        - generic [ref=f4e80] [cursor=pointer]:
+          - generic [ref=f4e82]: circle-7
+          - generic [ref=f4e83]: circle
+        - generic [ref=f4e84] [cursor=pointer]:
+          - generic [ref=f4e86]: planet
+          - generic [ref=f4e87]: circle
+        - generic [ref=f4e88] [cursor=pointer]:
+          - generic [ref=f4e90]: planetRing
+          - generic [ref=f4e91]: ellipse
+        - generic [ref=f4e92] [cursor=pointer]:
+          - generic [ref=f4e94]: rocket
+          - generic [ref=f4e95]: g
+        - generic [ref=f4e96] [cursor=pointer]:
+          - generic [ref=f4e98]: body
+          - generic [ref=f4e99]: path
+        - generic [ref=f4e100] [cursor=pointer]:
+          - generic [ref=f4e102]: bodyAccent
+          - generic [ref=f4e103]: path
+        - generic [ref=f4e104] [cursor=pointer]:
+          - generic [ref=f4e106]: window
+          - generic [ref=f4e107]: circle
+        - generic [ref=f4e108] [cursor=pointer]:
+          - generic [ref=f4e110]: windowInner
+          - generic [ref=f4e111]: circle
+        - generic [ref=f4e112] [cursor=pointer]:
+          - generic [ref=f4e114]: leftFin
+          - generic [ref=f4e115]: path
+        - generic [ref=f4e116] [cursor=pointer]:
+          - generic [ref=f4e118]: rightFin
+          - generic [ref=f4e119]: path
+        - generic [ref=f4e120] [cursor=pointer]:
+          - generic [ref=f4e122]: flame
+          - generic [ref=f4e123]: path
+        - generic [ref=f4e124] [cursor=pointer]:
+          - generic [ref=f4e126]: clouds
+          - generic [ref=f4e127]: g
+        - generic [ref=f4e128] [cursor=pointer]:
+          - generic [ref=f4e130]: cloud1
+          - generic [ref=f4e131]: ellipse
+        - generic [ref=f4e132] [cursor=pointer]:
+          - generic [ref=f4e134]: cloud2
+          - generic [ref=f4e135]: ellipse
+        - generic [ref=f4e136] [cursor=pointer]:
+          - generic [ref=f4e138]: ground
+          - generic [ref=f4e139]: rect
+    - generic [ref=f4e140]:
+      - generic [ref=f4e141]:
+        - generic [ref=f4e143]: viewBox 0 0 400 400
+        - generic [ref=f4e144]:
+          - button "All" [ref=f4e145] [cursor=pointer]
+          - button "None" [ref=f4e146] [cursor=pointer]
+      - img [ref=f4e149]
+    - complementary [ref=f4e173]:
+      - button [ref=f4e174] [cursor=pointer]:
+        - img [ref=f4e175]
+      - generic [ref=f4e178]: Properties
+      - generic [ref=f4e180]: Select an element to edit its animation.
+  - contentinfo [ref=f4e181]:
+    - generic [ref=f4e183]:
+      - generic [ref=f4e184]: 0.0s
+      - generic [ref=f4e186]: 1.0s
+      - generic [ref=f4e188]: 2.0s
+      - generic [ref=f4e190]: 3.0s
+      - generic [ref=f4e192]: 4.0s
+    - generic [ref=f4e195]: No animations yet. Select an element and assign a preset.
+  - generic:
+    - generic: Loaded · 23 elements

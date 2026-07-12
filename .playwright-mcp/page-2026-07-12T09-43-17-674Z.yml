@@ -1,0 +1,329 @@
+- generic [ref=f10e2]:
+  - banner [ref=f10e3]:
+    - generic [ref=f10e4]: SVG Animation Studio
+    - generic [ref=f10e10]:
+      - button "Start" [ref=f10e11] [cursor=pointer]
+      - button [ref=f10e14] [cursor=pointer]
+      - button "End" [ref=f10e17] [cursor=pointer]
+      - generic [ref=f10e20]:
+        - generic [ref=f10e21]: 0.0s
+        - generic [ref=f10e22]: /
+        - generic [ref=f10e23]: 4.0s
+    - generic [ref=f10e24]:
+      - button "Import SVG" [ref=f10e25] [cursor=pointer]
+      - button "Paste" [ref=f10e29] [cursor=pointer]
+      - button "Export Lottie" [ref=f10e34] [cursor=pointer]
+      - button "CSS" [ref=f10e38] [cursor=pointer]
+  - generic [ref=f10e42]:
+    - complementary [ref=f10e43]:
+      - generic [ref=f10e44]:
+        - generic [ref=f10e45]: Elements
+        - generic [ref=f10e46]: "23"
+      - generic [ref=f10e47]:
+        - generic [ref=f10e48] [cursor=pointer]:
+          - generic [ref=f10e50]: background
+          - generic [ref=f10e51]: rect
+        - generic [ref=f10e52] [cursor=pointer]:
+          - generic [ref=f10e54]: stars
+          - generic [ref=f10e55]: g
+        - generic [ref=f10e56] [cursor=pointer]:
+          - generic [ref=f10e58]: circle-1
+          - generic [ref=f10e59]: circle
+        - generic [ref=f10e60] [cursor=pointer]:
+          - generic [ref=f10e62]: circle-2
+          - generic [ref=f10e63]: circle
+        - generic [ref=f10e64] [cursor=pointer]:
+          - generic [ref=f10e66]: circle-3
+          - generic [ref=f10e67]: circle
+        - generic [ref=f10e68] [cursor=pointer]:
+          - generic [ref=f10e70]: circle-4
+          - generic [ref=f10e71]: circle
+        - generic [ref=f10e72] [cursor=pointer]:
+          - generic [ref=f10e74]: circle-5
+          - generic [ref=f10e75]: circle
+        - generic [ref=f10e76] [cursor=pointer]:
+          - generic [ref=f10e78]: circle-6
+          - generic [ref=f10e79]: circle
+        - generic [ref=f10e80] [cursor=pointer]:
+          - generic [ref=f10e82]: circle-7
+          - generic [ref=f10e83]: circle
+        - generic [ref=f10e84] [cursor=pointer]:
+          - generic [ref=f10e86]: planet
+          - generic [ref=f10e87]: circle
+        - generic [ref=f10e88] [cursor=pointer]:
+          - generic [ref=f10e90]: planetRing
+          - generic [ref=f10e91]: ellipse
+        - generic [ref=f10e92] [cursor=pointer]:
+          - generic [ref=f10e94]: rocket
+          - generic [ref=f10e95]: g
+        - generic [ref=f10e96] [cursor=pointer]:
+          - generic [ref=f10e98]: body
+          - generic [ref=f10e99]: path
+        - generic [ref=f10e100] [cursor=pointer]:
+          - generic [ref=f10e102]: bodyAccent
+          - generic [ref=f10e103]: path
+        - generic [ref=f10e104] [cursor=pointer]:
+          - generic [ref=f10e106]: window
+          - generic [ref=f10e107]: circle
+        - generic [ref=f10e108] [cursor=pointer]:
+          - generic [ref=f10e110]: windowInner
+          - generic [ref=f10e111]: circle
+        - generic [ref=f10e112] [cursor=pointer]:
+          - generic [ref=f10e114]: leftFin
+          - generic [ref=f10e115]: path
+        - generic [ref=f10e116] [cursor=pointer]:
+          - generic [ref=f10e118]: rightFin
+          - generic [ref=f10e119]: path
+        - generic [ref=f10e120] [cursor=pointer]:
+          - generic [ref=f10e122]: flame
+          - generic [ref=f10e123]: path
+        - generic [ref=f10e124] [cursor=pointer]:
+          - generic [ref=f10e126]: clouds
+          - generic [ref=f10e127]: g
+        - generic [ref=f10e128] [cursor=pointer]:
+          - generic [ref=f10e130]: cloud1
+          - generic [ref=f10e131]: ellipse
+        - generic [ref=f10e132] [cursor=pointer]:
+          - generic [ref=f10e134]: cloud2
+          - generic [ref=f10e135]: ellipse
+        - generic [ref=f10e136] [cursor=pointer]:
+          - generic [ref=f10e138]: ground
+          - generic [ref=f10e139]: rect
+    - generic [ref=f10e141]:
+      - generic [ref=f10e142]:
+        - generic [ref=f10e143]: viewBox 0 0 400 400
+        - generic [ref=f10e197]: g · rocket
+      - generic [ref=f10e144]:
+        - button "All" [ref=f10e145] [cursor=pointer]
+        - button "None" [ref=f10e146] [cursor=pointer]
+    - complementary [ref=f10e173]:
+      - button [ref=f10e174] [cursor=pointer]
+      - generic [ref=f10e177]: Properties
+      - generic [ref=f10e198]:
+        - generic [ref=f10e199]:
+          - generic [ref=f10e200]: Animation Preset
+          - generic [ref=f10e201]:
+            - button "All" [ref=f10e202] [cursor=pointer]
+            - button "Entrance" [ref=f10e203] [cursor=pointer]
+            - button "Emphasis" [ref=f10e204] [cursor=pointer]
+            - button "Exit" [ref=f10e205] [cursor=pointer]
+          - generic [ref=f10e206]:
+            - generic [ref=f10e207] [cursor=pointer]:
+              - generic [ref=f10e208]: Fade In
+              - generic [ref=f10e209]: entrance
+            - generic [ref=f10e210] [cursor=pointer]:
+              - generic [ref=f10e211]: Fade In Up
+              - generic [ref=f10e212]: entrance
+            - generic [ref=f10e213] [cursor=pointer]:
+              - generic [ref=f10e214]: Fade In Down
+              - generic [ref=f10e215]: entrance
+            - generic [ref=f10e216] [cursor=pointer]:
+              - generic [ref=f10e217]: Fade In Left
+              - generic [ref=f10e218]: entrance
+            - generic [ref=f10e219] [cursor=pointer]:
+              - generic [ref=f10e220]: Fade In Right
+              - generic [ref=f10e221]: entrance
+            - generic [ref=f10e222] [cursor=pointer]:
+              - generic [ref=f10e223]: Fade + Scale
+              - generic [ref=f10e224]: entrance
+            - generic [ref=f10e225] [cursor=pointer]:
+              - generic [ref=f10e226]: Slide In Up
+              - generic [ref=f10e227]: entrance
+            - generic [ref=f10e228] [cursor=pointer]:
+              - generic [ref=f10e229]: Slide In Down
+              - generic [ref=f10e230]: entrance
+            - generic [ref=f10e231] [cursor=pointer]:
+              - generic [ref=f10e232]: Slide In Left
+              - generic [ref=f10e233]: entrance
+            - generic [ref=f10e234] [cursor=pointer]:
+              - generic [ref=f10e235]: Slide In Right
+              - generic [ref=f10e236]: entrance
+            - generic [ref=f10e237] [cursor=pointer]:
+              - generic [ref=f10e238]: Zoom In
+              - generic [ref=f10e239]: entrance
+            - generic [ref=f10e240] [cursor=pointer]:
+              - generic [ref=f10e241]: Zoom Out Enter
+              - generic [ref=f10e242]: entrance
+            - generic [ref=f10e243] [cursor=pointer]:
+              - generic [ref=f10e244]: Flip In X
+              - generic [ref=f10e245]: entrance
+            - generic [ref=f10e246] [cursor=pointer]:
+              - generic [ref=f10e247]: Flip In Y
+              - generic [ref=f10e248]: entrance
+            - generic [ref=f10e249] [cursor=pointer]:
+              - generic [ref=f10e250]: Bounce In
+              - generic [ref=f10e251]: entrance
+            - generic [ref=f10e252] [cursor=pointer]:
+              - generic [ref=f10e253]: Pulse
+              - generic [ref=f10e254]: emphasis
+            - generic [ref=f10e255] [cursor=pointer]:
+              - generic [ref=f10e256]: Bounce
+              - generic [ref=f10e257]: emphasis
+            - generic [ref=f10e258] [cursor=pointer]:
+              - generic [ref=f10e259]: Shake
+              - generic [ref=f10e260]: emphasis
+            - generic [ref=f10e261] [cursor=pointer]:
+              - generic [ref=f10e262]: Head Shake
+              - generic [ref=f10e263]: emphasis
+            - generic [ref=f10e264] [cursor=pointer]:
+              - generic [ref=f10e265]: Swing
+              - generic [ref=f10e266]: emphasis
+            - generic [ref=f10e267] [cursor=pointer]:
+              - generic [ref=f10e268]: Tada
+              - generic [ref=f10e269]: emphasis
+            - generic [ref=f10e270] [cursor=pointer]:
+              - generic [ref=f10e271]: Wobble
+              - generic [ref=f10e272]: emphasis
+            - generic [ref=f10e273] [cursor=pointer]:
+              - generic [ref=f10e274]: Jello
+              - generic [ref=f10e275]: emphasis
+            - generic [ref=f10e276] [cursor=pointer]:
+              - generic [ref=f10e277]: Flash
+              - generic [ref=f10e278]: emphasis
+            - generic [ref=f10e279] [cursor=pointer]:
+              - generic [ref=f10e280]: Heart Beat
+              - generic [ref=f10e281]: emphasis
+            - generic [ref=f10e282] [cursor=pointer]:
+              - generic [ref=f10e283]: Rubber Band
+              - generic [ref=f10e284]: emphasis
+            - generic [ref=f10e285] [cursor=pointer]:
+              - generic [ref=f10e286]: Glow
+              - generic [ref=f10e287]: emphasis
+            - generic [ref=f10e288] [cursor=pointer]:
+              - generic [ref=f10e289]: Wave
+              - generic [ref=f10e290]: emphasis
+            - generic [ref=f10e291] [cursor=pointer]:
+              - generic [ref=f10e292]: Spin
+              - generic [ref=f10e293]: emphasis
+            - generic [ref=f10e294] [cursor=pointer]:
+              - generic [ref=f10e295]: Spin Half
+              - generic [ref=f10e296]: emphasis
+            - generic [ref=f10e297] [cursor=pointer]:
+              - generic [ref=f10e298]: Pulse Quick
+              - generic [ref=f10e299]: emphasis
+            - generic [ref=f10e300] [cursor=pointer]:
+              - generic [ref=f10e301]: Vibrate
+              - generic [ref=f10e302]: emphasis
+            - generic [ref=f10e303] [cursor=pointer]:
+              - generic [ref=f10e304]: Vert Bounce
+              - generic [ref=f10e305]: emphasis
+            - generic [ref=f10e306] [cursor=pointer]:
+              - generic [ref=f10e307]: Horiz Bounce
+              - generic [ref=f10e308]: emphasis
+            - generic [ref=f10e309] [cursor=pointer]:
+              - generic [ref=f10e310]: Rotate + Scale
+              - generic [ref=f10e311]: emphasis
+            - generic [ref=f10e312] [cursor=pointer]:
+              - generic [ref=f10e313]: Blink
+              - generic [ref=f10e314]: emphasis
+            - generic [ref=f10e315] [cursor=pointer]:
+              - generic [ref=f10e316]: Flip
+              - generic [ref=f10e317]: emphasis
+            - generic [ref=f10e318] [cursor=pointer]:
+              - generic [ref=f10e319]: Wobble Vert
+              - generic [ref=f10e320]: emphasis
+            - generic [ref=f10e321] [cursor=pointer]:
+              - generic [ref=f10e322]: Skew
+              - generic [ref=f10e323]: emphasis
+            - generic [ref=f10e324] [cursor=pointer]:
+              - generic [ref=f10e325]: Fade Out
+              - generic [ref=f10e326]: exit
+            - generic [ref=f10e327] [cursor=pointer]:
+              - generic [ref=f10e328]: Fade Out Up
+              - generic [ref=f10e329]: exit
+            - generic [ref=f10e330] [cursor=pointer]:
+              - generic [ref=f10e331]: Fade Out Down
+              - generic [ref=f10e332]: exit
+            - generic [ref=f10e333] [cursor=pointer]:
+              - generic [ref=f10e334]: Fade Out Left
+              - generic [ref=f10e335]: exit
+            - generic [ref=f10e336] [cursor=pointer]:
+              - generic [ref=f10e337]: Fade Out Right
+              - generic [ref=f10e338]: exit
+            - generic [ref=f10e339] [cursor=pointer]:
+              - generic [ref=f10e340]: Slide Out Up
+              - generic [ref=f10e341]: exit
+            - generic [ref=f10e342] [cursor=pointer]:
+              - generic [ref=f10e343]: Slide Out Down
+              - generic [ref=f10e344]: exit
+            - generic [ref=f10e345] [cursor=pointer]:
+              - generic [ref=f10e346]: Slide Out Left
+              - generic [ref=f10e347]: exit
+            - generic [ref=f10e348] [cursor=pointer]:
+              - generic [ref=f10e349]: Slide Out Right
+              - generic [ref=f10e350]: exit
+            - generic [ref=f10e351] [cursor=pointer]:
+              - generic [ref=f10e352]: Zoom Out
+              - generic [ref=f10e353]: exit
+            - generic [ref=f10e354] [cursor=pointer]:
+              - generic [ref=f10e355]: Zoom Out Big
+              - generic [ref=f10e356]: exit
+            - generic [ref=f10e357] [cursor=pointer]:
+              - generic [ref=f10e358]: Flip Out X
+              - generic [ref=f10e359]: exit
+            - generic [ref=f10e360] [cursor=pointer]:
+              - generic [ref=f10e361]: Flip Out Y
+              - generic [ref=f10e362]: exit
+            - generic [ref=f10e363] [cursor=pointer]:
+              - generic [ref=f10e364]: Bounce Out
+              - generic [ref=f10e365]: exit
+            - generic [ref=f10e366] [cursor=pointer]:
+              - generic [ref=f10e367]: Collapse
+              - generic [ref=f10e368]: exit
+            - generic [ref=f10e369] [cursor=pointer]:
+              - generic [ref=f10e370]: Fold
+              - generic [ref=f10e371]: exit
+            - generic [ref=f10e372] [cursor=pointer]:
+              - generic [ref=f10e373]: Dissolve
+              - generic [ref=f10e374]: exit
+            - generic [ref=f10e375] [cursor=pointer]:
+              - generic [ref=f10e376]: Drop Out
+              - generic [ref=f10e377]: exit
+            - generic [ref=f10e378] [cursor=pointer]:
+              - generic [ref=f10e379]: Wipe Out
+              - generic [ref=f10e380]: exit
+            - generic [ref=f10e381] [cursor=pointer]:
+              - generic [ref=f10e382]: Vanish
+              - generic [ref=f10e383]: exit
+        - generic [ref=f10e384]:
+          - generic [ref=f10e385]: Timing
+          - generic [ref=f10e386]:
+            - generic [ref=f10e387]: Duration
+            - generic [ref=f10e388]:
+              - slider [ref=f10e389]: "0.6"
+              - generic [ref=f10e390]: 0.6s
+          - generic [ref=f10e391]:
+            - generic [ref=f10e392]: Delay
+            - generic [ref=f10e393]:
+              - slider [ref=f10e394]: "0"
+              - generic [ref=f10e395]: 0.0s
+          - generic [ref=f10e396]:
+            - generic [ref=f10e397]: Start (timeline)
+            - generic [ref=f10e398]:
+              - slider [ref=f10e399]: "0"
+              - generic [ref=f10e400]: 0.0s
+        - generic [ref=f10e401]:
+          - generic [ref=f10e402]: Options
+          - generic [ref=f10e403]:
+            - generic [ref=f10e404]: Easing
+            - generic [ref=f10e405]:
+              - button "Ease" [ref=f10e406] [cursor=pointer]
+              - button "E-I-O" [ref=f10e407] [cursor=pointer]
+              - button "Bounce" [ref=f10e408] [cursor=pointer]
+              - button "Linear" [ref=f10e409] [cursor=pointer]
+          - generic [ref=f10e410]:
+            - generic [ref=f10e411]: Repeat
+            - generic [ref=f10e412]:
+              - button "1×" [ref=f10e413] [cursor=pointer]
+              - button "2×" [ref=f10e414] [cursor=pointer]
+              - button "3×" [ref=f10e415] [cursor=pointer]
+              - button "∞" [ref=f10e416] [cursor=pointer]
+        - button "Assign Animation" [ref=f10e418] [cursor=pointer]
+  - contentinfo [ref=f10e181]:
+    - generic [ref=f10e183]:
+      - generic: 0.0s
+      - generic: 1.0s
+      - generic: 2.0s
+      - generic: 3.0s
+      - generic: 4.0s
+    - generic [ref=f10e194]: No animations yet. Select an element and assign a preset.

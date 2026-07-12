@@ -1,0 +1,109 @@
+- generic [ref=f9e2]:
+  - banner [ref=f9e3]:
+    - generic [ref=f9e4]: SVG Animation Studio
+    - generic [ref=f9e10]:
+      - button "Start" [ref=f9e11] [cursor=pointer]
+      - button [ref=f9e14] [cursor=pointer]
+      - button "End" [ref=f9e17] [cursor=pointer]
+      - generic [ref=f9e20]:
+        - generic [ref=f9e21]: 0.0s
+        - generic [ref=f9e22]: /
+        - generic [ref=f9e23]: 4.0s
+    - generic [ref=f9e24]:
+      - button "Import SVG" [ref=f9e25] [cursor=pointer]
+      - button "Paste" [ref=f9e29] [cursor=pointer]
+      - button "Export Lottie" [ref=f9e34] [cursor=pointer]
+      - button "CSS" [ref=f9e38] [cursor=pointer]
+  - generic [ref=f9e42]:
+    - complementary [ref=f9e43]:
+      - generic [ref=f9e44]:
+        - generic [ref=f9e45]: Elements
+        - generic [ref=f9e46]: "23"
+      - generic [ref=f9e47]:
+        - generic [ref=f9e48] [cursor=pointer]:
+          - generic [ref=f9e50]: background
+          - generic [ref=f9e51]: rect
+        - generic [ref=f9e52] [cursor=pointer]:
+          - generic [ref=f9e54]: stars
+          - generic [ref=f9e55]: g
+        - generic [ref=f9e56] [cursor=pointer]:
+          - generic [ref=f9e58]: circle-1
+          - generic [ref=f9e59]: circle
+        - generic [ref=f9e60] [cursor=pointer]:
+          - generic [ref=f9e62]: circle-2
+          - generic [ref=f9e63]: circle
+        - generic [ref=f9e64] [cursor=pointer]:
+          - generic [ref=f9e66]: circle-3
+          - generic [ref=f9e67]: circle
+        - generic [ref=f9e68] [cursor=pointer]:
+          - generic [ref=f9e70]: circle-4
+          - generic [ref=f9e71]: circle
+        - generic [ref=f9e72] [cursor=pointer]:
+          - generic [ref=f9e74]: circle-5
+          - generic [ref=f9e75]: circle
+        - generic [ref=f9e76] [cursor=pointer]:
+          - generic [ref=f9e78]: circle-6
+          - generic [ref=f9e79]: circle
+        - generic [ref=f9e80] [cursor=pointer]:
+          - generic [ref=f9e82]: circle-7
+          - generic [ref=f9e83]: circle
+        - generic [ref=f9e84] [cursor=pointer]:
+          - generic [ref=f9e86]: planet
+          - generic [ref=f9e87]: circle
+        - generic [ref=f9e88] [cursor=pointer]:
+          - generic [ref=f9e90]: planetRing
+          - generic [ref=f9e91]: ellipse
+        - generic [ref=f9e92] [cursor=pointer]:
+          - generic [ref=f9e94]: rocket
+          - generic [ref=f9e95]: g
+        - generic [ref=f9e96] [cursor=pointer]:
+          - generic [ref=f9e98]: body
+          - generic [ref=f9e99]: path
+        - generic [ref=f9e100] [cursor=pointer]:
+          - generic [ref=f9e102]: bodyAccent
+          - generic [ref=f9e103]: path
+        - generic [ref=f9e104] [cursor=pointer]:
+          - generic [ref=f9e106]: window
+          - generic [ref=f9e107]: circle
+        - generic [ref=f9e108] [cursor=pointer]:
+          - generic [ref=f9e110]: windowInner
+          - generic [ref=f9e111]: circle
+        - generic [ref=f9e112] [cursor=pointer]:
+          - generic [ref=f9e114]: leftFin
+          - generic [ref=f9e115]: path
+        - generic [ref=f9e116] [cursor=pointer]:
+          - generic [ref=f9e118]: rightFin
+          - generic [ref=f9e119]: path
+        - generic [ref=f9e120] [cursor=pointer]:
+          - generic [ref=f9e122]: flame
+          - generic [ref=f9e123]: path
+        - generic [ref=f9e124] [cursor=pointer]:
+          - generic [ref=f9e126]: clouds
+          - generic [ref=f9e127]: g
+        - generic [ref=f9e128] [cursor=pointer]:
+          - generic [ref=f9e130]: cloud1
+          - generic [ref=f9e131]: ellipse
+        - generic [ref=f9e132] [cursor=pointer]:
+          - generic [ref=f9e134]: cloud2
+          - generic [ref=f9e135]: ellipse
+        - generic [ref=f9e136] [cursor=pointer]:
+          - generic [ref=f9e138]: ground
+          - generic [ref=f9e139]: rect
+    - generic [ref=f9e141]:
+      - generic [ref=f9e142]: viewBox 0 0 400 400
+      - generic [ref=f9e144]:
+        - button "All" [ref=f9e145] [cursor=pointer]
+        - button "None" [ref=f9e146] [cursor=pointer]
+    - complementary [ref=f9e173]:
+      - button [ref=f9e174] [cursor=pointer]
+      - generic [ref=f9e177]: Properties
+      - generic [ref=f9e179]: Select an element to edit its animation.
+  - contentinfo [ref=f9e181]:
+    - generic [ref=f9e183]:
+      - generic: 0.0s
+      - generic: 1.0s
+      - generic: 2.0s
+      - generic: 3.0s
+      - generic: 4.0s
+    - generic [ref=f9e194]: No animations yet. Select an element and assign a preset.
+  - generic: Loaded · 23 elements

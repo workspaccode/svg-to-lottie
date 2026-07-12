@@ -8,233 +8,286 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
-</style>
+<script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
 </head>
 <body>
-  <header class="header">
-    <div class="logo">
-      <div class="logo-mark">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3l14 9-14 9V3z"/></svg>
-      </div>
-      <div>
+  <div id="app" :class="'theme-' + theme">
+
+    <!-- ===== TOP BAR ===== -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <div class="logo-mark">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3l14 9-14 9V3z"/></svg>
+        </div>
         <div class="logo-text">SVG <span>Animation</span> Studio</div>
-        <div class="logo-sub">Craft motion · Ship CSS · Export Lottie</div>
       </div>
-    </div>
-    <div class="spacer"></div>
-    <div class="shortcut-hint">
-      <span><kbd>Click</kbd> Select</span>
-      <span><kbd>Ctrl+Click</kbd> Multi</span>
-      <span><kbd>Space</kbd> Run</span>
-      <span><kbd>Esc</kbd> Reset</span>
-    </div>
-    <div class="header-actions">
-      <button class="icon-btn" id="themeToggle" title="Toggle theme" aria-label="Toggle theme">
-        <svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-      </button>
-    </div>
-  </header>
 
-  <main class="main">
-    <aside class="sidebar">
-      <div class="sidebar-section">
-        <div class="section-title"><span>SVG Source</span></div>
-        <div class="svg-input-buttons">
-          <button class="btn btn-secondary" id="uploadBtn">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-            Upload
+      <div class="topbar-center">
+        <div class="playback-controls">
+          <button class="pb-btn" @click="seekToStart" title="Start">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
           </button>
-          <button class="btn btn-secondary" id="pasteBtn">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></svg>
-            Paste
+          <button class="pb-btn pb-play" @click="togglePlay" :class="{ active: isPlaying }">
+            <svg v-if="!isPlaying" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+            <svg v-else viewBox="0 0 24 24" fill="currentColor"><path d="M6 4h4v16H6zm8 0h4v16h-4z"/></svg>
           </button>
-          <input type="file" id="fileInput" accept=".svg,image/svg+xml" hidden>
+          <button class="pb-btn" @click="seekToEnd" title="End">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 6h2v12h-2zM6 18l8.5-6L6 6z"/></svg>
+          </button>
+          <div class="time-display">
+            <span class="time-current">{{ formatTime(playhead) }}</span>
+            <span class="time-sep">/</span>
+            <span class="time-total">{{ formatTime(duration) }}</span>
+          </div>
         </div>
       </div>
 
-      <div class="sidebar-scroll">
-        <div class="elements-section">
-          <div class="elements-header">
-            <div class="section-title" style="margin-bottom:0;">
-              <span>Elements</span>
-              <span class="count" id="elementCount">0</span>
-            </div>
-            <div class="elements-actions">
-              <button class="btn btn-ghost" id="selectAllBtn" title="Select all">All</button>
-              <button class="btn btn-ghost" id="createGroupBtn" title="Create group from selection" style="display:none;">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
-                Group
-              </button>
-            </div>
-          </div>
-          <div class="elements-list" id="elementsList"></div>
-        </div>
+      <div class="topbar-right">
+        <button class="tb-btn" @click="$refs.fileInput.click()">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          Import SVG
+        </button>
+        <button class="tb-btn" @click="showPasteModal = true">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          Paste
+        </button>
+        <div class="tb-divider"></div>
+        <button class="tb-btn tb-accent" @click="exportLottie">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Export Lottie
+        </button>
+        <button class="tb-btn" @click="exportCSS">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+          CSS
+        </button>
+        <input type="file" ref="fileInput" accept=".svg,image/svg+xml" hidden @change="onFileUpload">
+      </div>
+    </header>
 
-        <div class="groups-section">
-          <div class="groups-header">
-            <div class="section-title" style="margin-bottom:0;">
-              <span>Groups</span>
-              <span class="count" id="groupCount">0</span>
-            </div>
-          </div>
-          <div class="groups-list" id="groupsList"></div>
-        </div>
-      </div>
-    </aside>
+    <!-- ===== MAIN BODY ===== -->
+    <div class="body">
 
-    <section class="canvas-area">
-      <div class="canvas-toolbar">
-        <div class="canvas-info">
-          <span class="badge" id="canvasInfo">No SVG loaded</span>
+      <!-- ===== LEFT SIDEBAR: ELEMENTS ===== -->
+      <aside class="left-panel">
+        <div class="panel-header">
+          <span>Elements</span>
+          <span class="count-badge">{{ elements.length }}</span>
         </div>
-        <div class="animation-indicator" id="animIndicator">
-          <span id="animText">Running…</span>
+        <div class="panel-scroll">
+          <div v-if="elements.length === 0" class="empty-hint">Import an SVG to see elements.</div>
+          <div v-for="(item, idx) in elements" :key="item.id"
+            class="elem-row"
+            :class="{ selected: selectedIndices.includes(idx), assigned: !!animations[idx] }"
+            @click="onElemClick(idx, $event)">
+            <div class="elem-color-dot" :style="{ background: item.color }"></div>
+            <span class="elem-label">{{ item.name }}</span>
+            <span class="elem-type">{{ item.tag }}</span>
+            <span v-if="animations[idx]" class="elem-preset-badge">{{ getPresetName(animations[idx].preset) }}</span>
+          </div>
         </div>
-        <div class="spacer"></div>
-        <div class="canvas-info">
-          <span class="badge selection" id="selectedInfo">No element selected</span>
-        </div>
-      </div>
-      <div class="canvas-wrap" id="canvasWrap">
-        <div class="svg-canvas" id="svgCanvas"></div>
-      </div>
-      <button class="drawer-toggle" id="drawerToggle" title="Toggle panel">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-      </button>
-    </section>
+      </aside>
 
-    <aside class="right-panel" id="rightPanel">
-      <div class="drawer-header">
-        <div class="drawer-tabs">
-          <button class="drawer-tab active" data-tab="presets">Presets</button>
-          <button class="drawer-tab" data-tab="settings">Settings</button>
-          <button class="drawer-tab" data-tab="elements">Elements</button>
-        </div>
-        <button class="drawer-close" id="drawerClose">✕</button>
-      </div>
-      <div class="drawer-body">
-        <div class="tab-content active" id="tabPresets">
-          <div class="tab-scroll">
-            <div class="preset-grid" id="presetGrid"></div>
+      <!-- ===== CENTER: CANVAS ===== -->
+      <section class="canvas-section">
+        <div class="canvas-toolbar">
+          <div class="canvas-info">
+            <span class="info-chip">{{ canvasInfo }}</span>
+            <span class="info-chip accent" v-if="selectedIndices.length > 0">{{ selectedInfo }}</span>
+          </div>
+          <div class="canvas-actions">
+            <button class="mini-btn" @click="selectAll" title="Select All (Ctrl+A)">All</button>
+            <button class="mini-btn" @click="clearSelection" title="Deselect">None</button>
+            <button class="mini-btn" v-if="selectedIndices.length >= 2" @click="createGroup">Group</button>
           </div>
         </div>
-        <div class="tab-content" id="tabSettings">
-          <div class="tab-scroll">
-            <div class="control">
-              <div class="control-label">
-                <span>Duration</span>
-                <span class="control-value" id="durationValue">0.6s</span>
-              </div>
-              <input type="range" id="durationSlider" min="0.1" max="3" step="0.1" value="0.6">
+        <div class="canvas-wrap" ref="canvasWrap">
+          <div class="svg-stage" ref="svgStage" v-html="svgHtml"
+            @click="onCanvasClick"
+            @mouseover="onCanvasOver"
+            @mouseout="onCanvasOut">
+          </div>
+          <!-- selection overlay -->
+          <div class="selection-overlay" ref="selectionOverlay"></div>
+        </div>
+      </section>
+
+      <!-- ===== RIGHT PANEL: PROPERTIES ===== -->
+      <aside class="right-panel" :class="{ open: rightOpen }">
+        <button class="panel-toggle" @click="rightOpen = !rightOpen">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+        <div class="panel-header">
+          <span>Properties</span>
+        </div>
+        <div class="panel-scroll" v-if="selectedIndices.length > 0">
+          <!-- Preset picker -->
+          <div class="prop-section">
+            <div class="prop-label">Animation Preset</div>
+            <div class="preset-cat-row">
+              <button v-for="cat in categories" :key="cat"
+                class="cat-pill" :class="{ active: currentCategory === cat }"
+                @click="currentCategory = cat">{{ catLabel(cat) }}</button>
             </div>
-            <div class="control">
-              <div class="control-label">
-                <span>Delay</span>
-                <span class="control-value" id="delayValue">0.0s</span>
-              </div>
-              <input type="range" id="delaySlider" min="0" max="2" step="0.1" value="0">
-            </div>
-            <div class="control control-hidden" id="staggerControl">
-              <div class="control-label">
-                <span>Stagger (between elements)</span>
-                <span class="control-value" id="staggerValue">0ms</span>
-              </div>
-              <input type="range" id="staggerSlider" min="0" max="500" step="10" value="0">
-            </div>
-            <div class="control">
-              <div class="control-label"><span>Repeat</span></div>
-              <div class="selector-group">
-                <button class="selector-btn active" data-repeat="1">Once</button>
-                <button class="selector-btn" data-repeat="2">Twice</button>
-                <button class="selector-btn" data-repeat="3">3×</button>
-                <button class="selector-btn" data-repeat="infinite">Loop</button>
-              </div>
-            </div>
-            <div class="control">
-              <div class="control-label"><span>Easing</span></div>
-              <div class="selector-group two-col">
-                <button class="selector-btn active" data-easing="ease">Ease</button>
-                <button class="selector-btn" data-easing="ease-in-out">Ease in-out</button>
-                <button class="selector-btn" data-easing="bounce">Bounce</button>
-                <button class="selector-btn" data-easing="linear">Linear</button>
+            <div class="preset-list">
+              <div v-for="p in filteredPresets" :key="p.id"
+                class="preset-row"
+                :class="{ selected: (animations[selectedIndices[0]]?.preset || selectedPreset) === p.id }"
+                @click="selectPreset(p.id)">
+                <span class="preset-row-name">{{ p.name }}</span>
+                <span class="preset-row-cat">{{ p.cat }}</span>
               </div>
             </div>
           </div>
-          <div class="drawer-actions">
-            <button class="btn btn-primary btn-sm" id="assignBtn" style="font-size:12px;padding:6px 12px;width:100%">
+
+          <!-- Timing controls -->
+          <div class="prop-section">
+            <div class="prop-label">Timing</div>
+            <div class="prop-control">
+              <label>Duration</label>
+              <div class="slider-row">
+                <input type="range" min="0.1" max="5" step="0.1" v-model.number="editDuration">
+                <span class="slider-val">{{ editDuration.toFixed(1) }}s</span>
+              </div>
+            </div>
+            <div class="prop-control">
+              <label>Delay</label>
+              <div class="slider-row">
+                <input type="range" min="0" max="5" step="0.1" v-model.number="editDelay">
+                <span class="slider-val">{{ editDelay.toFixed(1) }}s</span>
+              </div>
+            </div>
+            <div class="prop-control">
+              <label>Start (timeline)</label>
+              <div class="slider-row">
+                <input type="range" min="0" max="10" step="0.1" v-model.number="editStart">
+                <span class="slider-val">{{ editStart.toFixed(1) }}s</span>
+              </div>
+            </div>
+            <div class="prop-control" v-if="selectedIndices.length > 1">
+              <label>Stagger</label>
+              <div class="slider-row">
+                <input type="range" min="0" max="1000" step="10" v-model.number="editStagger">
+                <span class="slider-val">{{ editStagger }}ms</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Easing + repeat -->
+          <div class="prop-section">
+            <div class="prop-label">Options</div>
+            <div class="prop-control">
+              <label>Easing</label>
+              <div class="seg-group">
+                <button v-for="opt in easingOptions" :key="opt.value"
+                  class="seg-btn" :class="{ active: editEasing === opt.value }"
+                  @click="editEasing = opt.value">{{ opt.label }}</button>
+              </div>
+            </div>
+            <div class="prop-control">
+              <label>Repeat</label>
+              <div class="seg-group">
+                <button v-for="opt in repeatOptions" :key="opt.value"
+                  class="seg-btn" :class="{ active: editRepeat === opt.value }"
+                  @click="editRepeat = opt.value">{{ opt.label }}</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="prop-actions">
+            <button class="action-btn primary" @click="assignAnimation">
               <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-              Assign to Element
+              Assign Animation
             </button>
-            <button class="btn btn-run" id="runBtn">
-              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-              Run Animation
-            </button>
-            <div class="drawer-actions-row">
-              <button class="btn btn-ghost" id="resetBtn">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
-                Reset
-              </button>
-              <button class="btn btn-secondary" id="exportCssBtn">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-                Export CSS
-              </button>
-            </div>
-            <button class="btn btn-secondary" id="exportLottieBtn">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              Export Lottie JSON
+            <button class="action-btn" v-if="selectedIndices.length === 1 && animations[selectedIndices[0]]" @click="clearAnimation(selectedIndices[0])">
+              Remove Animation
             </button>
           </div>
         </div>
-        <div class="tab-content" id="tabElements">
-          <div class="tab-scroll" id="elementAssignmentsList">
-            <div class="empty-state">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-              <div>No elements loaded.</div>
+        <div class="panel-scroll" v-else>
+          <div class="empty-hint">Select an element to edit its animation.</div>
+        </div>
+      </aside>
+    </div>
+
+    <!-- ===== TIMELINE ===== -->
+    <footer class="timeline" ref="timelineEl" @click.self="onTimelineClick">
+      <div class="timeline-ruler">
+        <div class="ruler-track">
+          <div v-for="t in rulerTicks" :key="t" class="ruler-tick" :class="{ 'tick-start': selectedAnimStart === t }" :style="{ left: (t / duration * 100) + '%' }">
+            <span class="tick-label">{{ t.toFixed(1) }}s</span>
+            <div class="tick-mark"></div>
+          </div>
+        </div>
+      </div>
+      <div class="timeline-tracks" ref="tracksEl">
+        <div v-if="animatedElements.length === 0" class="timeline-empty">
+          No animations yet. Select an element and assign a preset.
+        </div>
+        <div v-for="track in timelineTracks" :key="track.idx" class="track-row"
+          :class="{ selected: selectedIndices.includes(track.idx) }"
+          @click="selectSingle(track.idx)">
+          <div class="track-label">
+            <span class="track-dot" :style="{ background: track.color }"></span>
+            <span class="track-name">{{ track.name }}</span>
+          </div>
+          <div class="track-bar-area">
+            <div class="track-bar"
+              :style="trackBarStyle(track)"
+              :class="['cat-' + track.cat]">
+              <span class="track-bar-label">{{ track.presetName }}</span>
             </div>
           </div>
         </div>
       </div>
-    </aside>
-  </main>
+      <div class="playhead" :style="{ left: (playhead / duration * 100) + '%' }">
+        <div class="playhead-handle" @mousedown="startScrub"></div>
+        <div class="playhead-line"></div>
+      </div>
+    </footer>
 
-  <div class="modal-backdrop" id="pasteModal">
-    <div class="modal">
-      <div class="modal-header">
-        <div class="modal-title">Paste SVG Code</div>
-        <button class="icon-btn" id="closePasteModal" aria-label="Close">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        </button>
-      </div>
-      <div class="modal-body">
-        <textarea id="pasteTextarea" placeholder="<svg viewBox='0 0 100 100'>&#10;  <rect x='10' y='10' width='30' height='30' fill='red'/>&#10;  <circle cx='60' cy='60' r='20' fill='blue'/>&#10;</svg>"></textarea>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-ghost" id="cancelPaste">Cancel</button>
-        <button class="btn btn-primary" id="confirmPaste">Load SVG</button>
+    <!-- ===== PASTE MODAL ===== -->
+    <div class="modal-backdrop" v-if="showPasteModal" @click.self="showPasteModal = false">
+      <div class="modal">
+        <div class="modal-header">
+          <span class="modal-title">Paste SVG Code</span>
+          <button class="modal-close" @click="showPasteModal = false">&times;</button>
+        </div>
+        <div class="modal-body">
+          <textarea v-model="pasteText" placeholder="Paste SVG markup here..." ref="pasteTextarea"></textarea>
+        </div>
+        <div class="modal-footer">
+          <button class="action-btn" @click="showPasteModal = false">Cancel</button>
+          <button class="action-btn primary" @click="confirmPaste">Load SVG</button>
+        </div>
       </div>
     </div>
-  </div>
 
-  <div class="modal-backdrop" id="cssModal">
-    <div class="modal">
-      <div class="modal-header">
-        <div class="modal-title">Generated CSS</div>
-        <button class="icon-btn" id="closeCssModal" aria-label="Close">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        </button>
-      </div>
-      <div class="modal-body">
-        <div class="code-block" id="cssOutput"></div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-ghost" id="closeCssModalBtn">Close</button>
-        <button class="btn btn-primary" id="copyCssBtn">Copy to Clipboard</button>
+    <!-- ===== CSS MODAL ===== -->
+    <div class="modal-backdrop" v-if="showCssModal" @click.self="showCssModal = false">
+      <div class="modal">
+        <div class="modal-header">
+          <span class="modal-title">Generated CSS</span>
+          <button class="modal-close" @click="showCssModal = false">&times;</button>
+        </div>
+        <div class="modal-body">
+          <pre class="code-output">{{ cssOutput }}</pre>
+        </div>
+        <div class="modal-footer">
+          <button class="action-btn" @click="showCssModal = false">Close</button>
+          <button class="action-btn primary" @click="copyCSS">Copy</button>
+        </div>
       </div>
     </div>
+
+    <!-- ===== TOASTS ===== -->
+    <div class="toast-container">
+      <transition-group name="toast">
+        <div v-for="t in toasts" :key="t.id" class="toast" :class="t.type">{{ t.message }}</div>
+      </transition-group>
+    </div>
+
   </div>
-
-  <div class="toast-container" id="toastContainer"></div>
-
 <script src="js/app.js"></script>
 </body>
 </html>

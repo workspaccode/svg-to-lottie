@@ -1,0 +1,13 @@
+[     533ms] Uncaught SyntaxError: Invalid or unexpected token
+    at aG (https://unpkg.com/vue@3/dist/vue.global.prod.js:12:317)
+    at iF (https://unpkg.com/vue@3/dist/vue.global.prod.js:6:32906)
+    at <anonymous> (https://unpkg.com/vue@3/dist/vue.global.prod.js:6:16854)
+    at <anonymous> (https://unpkg.com/vue@3/dist/vue.global.prod.js:6:16862)
+    at q (https://unpkg.com/vue@3/dist/vue.global.prod.js:6:16877)
+    at U (https://unpkg.com/vue@3/dist/vue.global.prod.js:6:14052)
+    at x (https://unpkg.com/vue@3/dist/vue.global.prod.js:6:10896)
+    at ea (https://unpkg.com/vue@3/dist/vue.global.prod.js:6:23933)
+    at mount (https://unpkg.com/vue@3/dist/vue.global.prod.js:6:24746)
+    at t.mount (https://unpkg.com/vue@3/dist/vue.global.prod.js:6:56279)
+    at <anonymous> (http://localhost:8923/js/app.js:1039:3)
+[     713ms] [ERROR] Failed to load resource: the server responded with a status of 404 (File not found) @ http://localhost:8923/favicon.ico:0
